@@ -300,7 +300,7 @@ export function PlayerScreen({
   const currentTime = formatDuration(status.currentTime);
   const progress = durationSeconds > 0 ? Math.min(1, status.currentTime / durationSeconds) : 0;
 
-  const bars = makeWaveformBars(64, 200, 5, colors.playerBar, {
+  const bars = makeWaveformBars(64, 200, colors.playerBar, {
     frequency: 1.6,
     phase: -0.9,
     power: 1.4,

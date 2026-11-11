@@ -47,7 +47,6 @@ export interface WaveformOptions {
 export function makeWaveformBars(
   count: number,
   maxHeight: number,
-  seed = 1,
   color = '#3156B8',
   options: WaveformOptions = {},
 ): WaveformBar[] {

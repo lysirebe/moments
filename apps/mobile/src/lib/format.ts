@@ -1,5 +1,7 @@
 /** Display formatters shared across screens. */
 
+import type { AudioFormat } from '@moments/types';
+
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 /**
@@ -49,4 +51,21 @@ export function formatFileSize(bytes?: number): string {
   if (!bytes) return '';
   const mb = bytes / (1024 * 1024);
   return mb >= 1 ? `${mb.toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`;
+}
+
+/**
+ * Builds a human-readable file name from a title, stripping characters that
+ * are illegal in file names and avoiding a doubled extension.
+ */
+export function toAudioFileName(title: string, format: AudioFormat): string {
+  const ext = `.${format}`;
+  let base = title.trim();
+  if (base.toLowerCase().endsWith(ext)) {
+    base = base.slice(0, -ext.length);
+  }
+  base = base
+    .replace(/[\\/:*?"<>|]/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return `${base || 'audio'}${ext}`;
 }

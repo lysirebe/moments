@@ -112,7 +112,7 @@ export function RecordingScreen({ onBack, onAddNote, onStop }: RecordingScreenPr
   const [error, setError] = useState<string | null>(null);
   const toastOpacity = useToast(lastNoteAddedAt);
   const bars = useRef(
-    makeWaveformBars(68, 250, 7, colors.recordingBar, {
+    makeWaveformBars(68, 250, colors.recordingBar, {
       accentColor: colors.recordingBarAccent,
     }),
   ).current;

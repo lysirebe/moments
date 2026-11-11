@@ -9,11 +9,9 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@moments/config": "*",
-    "typescript": "^5.7.2"
+    "@moments/config": "*"
   }
 }

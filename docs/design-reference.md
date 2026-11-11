@@ -1,4 +1,9 @@
-# Moments — React Native reference guide
+# Moments — design reference
+
+> The original screen-by-screen design hand-off. The `.dc.html` screen specs and
+> PNG exports it mentions live outside this repository. Where its stack
+> suggestions differ from the code (e.g. expo-router, SQLite), the
+> [architecture decision records](./decisions/README.md) are the source of truth.
 
 A reference for building Moments screen by screen. It describes what each screen is, how it should look and behave, and where the exact values live. It does not prescribe a build order or ask for the whole app at once.
 

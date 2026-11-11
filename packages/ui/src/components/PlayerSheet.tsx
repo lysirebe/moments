@@ -11,7 +11,6 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { colors, fonts, radii } from '../theme';
-import { NoteRow } from './NoteRow';
 
 export interface PlayerSheetSection {
   type: 'notes' | 'scripture' | 'prayer' | 'revelation' | 'favourite' | 'reflection';

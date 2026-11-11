@@ -1,6 +1,5 @@
 import React from 'react';
 import { Pressable, StyleSheet, type PressableProps, type ViewStyle } from 'react-native';
-import { colors } from '../theme';
 
 export interface IconButtonProps extends Omit<PressableProps, 'style'> {
   /** Accessibility label (required for icon-only buttons). */

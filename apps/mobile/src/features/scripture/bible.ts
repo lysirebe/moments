@@ -9,11 +9,6 @@ import { supabase } from '../../lib/supabase';
 
 const EDGE_FUNCTION = 'bible';
 
-interface InvokeResult<T> {
-  data: T;
-  error: { message: string } | null;
-}
-
 async function invoke<T>(body: Record<string, string>): Promise<T> {
   const { data, error } = await supabase.functions.invoke<T>(EDGE_FUNCTION, {
     body,

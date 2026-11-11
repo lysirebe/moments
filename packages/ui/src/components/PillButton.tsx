@@ -7,7 +7,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { colors, fonts, radii, spacing } from '../theme';
+import { colors, fonts, radii } from '../theme';
 
 export type PillButtonVariant = 'primary' | 'outline' | 'ghost';
 

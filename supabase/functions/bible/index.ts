@@ -23,7 +23,7 @@ interface BibleRequest {
 }
 
 /** IDs from api.bible are alphanumeric with `.` and `-` separators. */
-const SAFE_ID = /^[A-Za-z0-9.\-]+$/;
+const SAFE_ID = /^[A-Za-z0-9.-]+$/;
 
 function isSafeId(value: unknown): value is string {
   return typeof value === 'string' && SAFE_ID.test(value);

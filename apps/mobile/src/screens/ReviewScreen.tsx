@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { colors, fonts, makeMiniBars } from '@moments/ui';
 import { PlayerCard, NoteRow, PaperGrain } from '@moments/ui';
 

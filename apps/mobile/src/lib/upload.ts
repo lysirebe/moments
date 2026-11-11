@@ -1,6 +1,7 @@
 import { File } from 'expo-file-system';
 import type { AudioFormat } from '@moments/types';
 
+import { toAudioFileName } from './format';
 import { AUDIO_BUCKET } from './storage';
 import { requireUserId, supabase } from './supabase';
 
@@ -32,23 +33,6 @@ export interface UploadAudioResult {
   path: string;
   /** Size in bytes. */
   size: number;
-}
-
-/**
- * Builds a human-readable file name from a title, stripping characters that
- * are illegal in file names and avoiding a doubled extension.
- */
-export function toFileName(title: string, format: AudioFormat): string {
-  const ext = `.${format}`;
-  let base = title.trim();
-  if (base.toLowerCase().endsWith(ext)) {
-    base = base.slice(0, -ext.length);
-  }
-  base = base
-    .replace(/[\\/:*?"<>|]/g, '-')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return `${base || 'audio'}${ext}`;
 }
 
 /**
@@ -93,7 +77,7 @@ export async function uploadAudio(input: UploadAudioInput): Promise<UploadAudioR
       moment_id: moment.id,
       user_id: userId,
       storage_path: path,
-      file_name: input.fileName ?? toFileName(title, input.format),
+      file_name: input.fileName ?? toAudioFileName(title, input.format),
       format: input.format,
       duration: input.duration,
       size: bytes.byteLength,

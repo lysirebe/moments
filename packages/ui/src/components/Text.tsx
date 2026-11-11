@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Text as RNText,
-  StyleSheet,
   type TextProps,
   type TextStyle,
 } from 'react-native';
