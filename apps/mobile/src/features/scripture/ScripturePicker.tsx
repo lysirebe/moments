@@ -41,9 +41,7 @@ export function ScripturePicker({
   saving,
   showHeader = true,
 }: ScripturePickerProps) {
-  const [bibleId, setBibleId] = useState<string>(
-    BIBLE_TRANSLATIONS[0]?.id ?? '',
-  );
+  const [bibleId, setBibleId] = useState<string>(BIBLE_TRANSLATIONS[0]?.id ?? '');
   const [bookId, setBookId] = useState<string>();
   const [chapterId, setChapterId] = useState<string>();
   const [startVerseId, setStartVerseId] = useState<string>();
@@ -256,9 +254,7 @@ export function ScripturePicker({
           onPress={handleSubmit}
           disabled={!canSubmit || loading || saving}
         />
-        {onCancel ? (
-          <Button label="Cancel" variant="ghost" onPress={onCancel} />
-        ) : null}
+        {onCancel ? <Button label="Cancel" variant="ghost" onPress={onCancel} /> : null}
       </View>
     </View>
   );

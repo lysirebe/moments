@@ -38,16 +38,10 @@ function BackIcon() {
  */
 export function EnrichScreen({ onBack, onContinue, onLater }: EnrichScreenProps) {
   const insets = useSafeAreaInsets();
-  const [selected, setSelected] = useState<EnrichmentType[]>([
-    'scripture',
-    'prayer',
-    'revelation',
-  ]);
+  const [selected, setSelected] = useState<EnrichmentType[]>(['scripture', 'prayer', 'revelation']);
 
   const toggle = (type: EnrichmentType) => {
-    setSelected((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
-    );
+    setSelected((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]));
   };
 
   return (
@@ -64,12 +58,8 @@ export function EnrichScreen({ onBack, onContinue, onLater }: EnrichScreenProps)
       </Pressable>
 
       <View style={[styles.content, { paddingTop: insets.top + 60 }]}>
-        <Text style={styles.title}>
-          Would you like to enrich your Moment?
-        </Text>
-        <Text style={styles.subtitle}>
-          Add Scripture, a prayer, a revelation and more.
-        </Text>
+        <Text style={styles.title}>Would you like to enrich your Moment?</Text>
+        <Text style={styles.subtitle}>Add Scripture, a prayer, a revelation and more.</Text>
 
         <View style={styles.grid}>
           {ENRICHMENT_ORDER.map((type) => (
@@ -92,11 +82,7 @@ export function EnrichScreen({ onBack, onContinue, onLater }: EnrichScreenProps)
         >
           <Text style={styles.continueText}>Continue with selected</Text>
         </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onLater}
-          style={styles.later}
-        >
+        <Pressable accessibilityRole="button" onPress={onLater} style={styles.later}>
           <Text style={styles.laterText}>Maybe later</Text>
         </Pressable>
       </View>

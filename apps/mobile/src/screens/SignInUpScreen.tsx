@@ -102,19 +102,12 @@ export function SignInUpScreen({ onBack }: SignInUpScreenProps) {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.scroll,
-          { paddingTop: insets.top + 72 },
-        ]}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 72 }]}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>
-          {isSignUp ? 'Create your account' : 'Welcome back'}
-        </Text>
+        <Text style={styles.title}>{isSignUp ? 'Create your account' : 'Welcome back'}</Text>
         <Text style={styles.subtitle}>
-          {isSignUp
-            ? 'A quiet place to keep what God is doing.'
-            : 'Pick up where you left off.'}
+          {isSignUp ? 'A quiet place to keep what God is doing.' : 'Pick up where you left off.'}
         </Text>
 
         <View style={styles.fields}>
@@ -182,9 +175,7 @@ export function SignInUpScreen({ onBack }: SignInUpScreenProps) {
           style={styles.switch}
         >
           <Text style={styles.switchText}>
-            {isSignUp
-              ? 'Already have an account? Sign in'
-              : 'New here? Create an account'}
+            {isSignUp ? 'Already have an account? Sign in' : 'New here? Create an account'}
           </Text>
         </Pressable>
       </ScrollView>
@@ -198,12 +189,8 @@ export function SignInUpScreen({ onBack }: SignInUpScreenProps) {
           disabled={!canSubmit}
           style={!canSubmit ? styles.disabled : undefined}
         />
-        {submitting ? (
-          <ActivityIndicator color={colors.cobalt} style={styles.spinner} />
-        ) : null}
-        <Text style={styles.terms}>
-          By continuing you agree to our Terms &amp; Privacy Policy.
-        </Text>
+        {submitting ? <ActivityIndicator color={colors.cobalt} style={styles.spinner} /> : null}
+        <Text style={styles.terms}>By continuing you agree to our Terms &amp; Privacy Policy.</Text>
       </View>
     </KeyboardAvoidingView>
   );

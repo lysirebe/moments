@@ -1,18 +1,8 @@
 import React from 'react';
-import {
-  Text as RNText,
-  type TextProps,
-  type TextStyle,
-} from 'react-native';
+import { Text as RNText, type TextProps, type TextStyle } from 'react-native';
 import { colors, fonts } from '../theme';
 
-export type TextVariant =
-  | 'display'
-  | 'heading'
-  | 'title'
-  | 'body'
-  | 'bodyLarge'
-  | 'caption';
+export type TextVariant = 'display' | 'heading' | 'title' | 'body' | 'bodyLarge' | 'caption';
 
 export interface AppTextProps extends TextProps {
   variant?: TextVariant;

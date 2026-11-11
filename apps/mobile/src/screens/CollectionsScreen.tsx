@@ -144,9 +144,7 @@ export function CollectionsScreen({
                 onPress={() => toggleFilter(item.value)}
                 style={[styles.chip, active && styles.chipActive]}
               >
-                <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                  {item.label}
-                </Text>
+                <Text style={[styles.chipText, active && styles.chipTextActive]}>{item.label}</Text>
               </Pressable>
             );
           })}
@@ -174,10 +172,7 @@ export function CollectionsScreen({
           </Text>
         </View>
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
-        >
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.list}>
           {visibleMoments.map((moment, index) => (
             <Pressable
               key={moment.id}

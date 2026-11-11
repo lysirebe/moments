@@ -63,9 +63,7 @@ export function PillButton({
       ]}
       {...rest}
     >
-      <Text style={[styles.label, { color: labelColors[variant] }]}>
-        {label}
-      </Text>
+      <Text style={[styles.label, { color: labelColors[variant] }]}>{label}</Text>
       {icon}
     </Pressable>
   );

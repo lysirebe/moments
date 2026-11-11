@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { colors, fonts, makeMiniBars } from '@moments/ui';
@@ -92,10 +84,7 @@ export function ReviewScreen({ onDiscard, onSave }: ReviewScreenProps) {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.scroll,
-          { paddingTop: insets.top + 40 },
-        ]}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 40 }]}
       >
         <TextInput
           value={title}
@@ -115,11 +104,7 @@ export function ReviewScreen({ onDiscard, onSave }: ReviewScreenProps) {
             <Text style={styles.overline}>NOTES SAVED</Text>
             <View style={styles.notes}>
               {notes.map((note) => (
-                <NoteRow
-                  key={note.id}
-                  time={formatDuration(note.timestamp)}
-                  text={note.content}
-                />
+                <NoteRow key={note.id} time={formatDuration(note.timestamp)} text={note.content} />
               ))}
             </View>
           </>

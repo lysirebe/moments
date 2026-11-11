@@ -23,12 +23,7 @@ const KIND_OPTIONS: { label: string; value: MomentNoteKind }[] = [
   { label: 'Reflection', value: 'reflection' },
 ];
 
-export function NoteForm({
-  onSave,
-  onCancel,
-  saving,
-  initialKind = 'reflection',
-}: NoteFormProps) {
+export function NoteForm({ onSave, onCancel, saving, initialKind = 'reflection' }: NoteFormProps) {
   const [kind, setKind] = useState<MomentNoteKind>(initialKind);
   const [content, setContent] = useState('');
 
@@ -61,17 +56,8 @@ export function NoteForm({
       />
 
       <View style={styles.actions}>
-        <Button
-          label="Save"
-          onPress={handleSave}
-          disabled={!canSave}
-        />
-        <Button
-          label="Cancel"
-          variant="ghost"
-          onPress={onCancel}
-          disabled={saving}
-        />
+        <Button label="Save" onPress={handleSave} disabled={!canSave} />
+        <Button label="Cancel" variant="ghost" onPress={onCancel} disabled={saving} />
       </View>
     </View>
   );

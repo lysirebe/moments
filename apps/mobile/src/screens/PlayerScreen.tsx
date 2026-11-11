@@ -1,19 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { colors, fonts, makeWaveformBars } from '@moments/ui';
 import { Waveform, PlayerSheet, PaperGrain } from '@moments/ui';
-import type {
-  PlayerSheetAddOption,
-  PlayerSheetSection,
-} from '@moments/ui';
+import type { PlayerSheetAddOption, PlayerSheetSection } from '@moments/ui';
 import type { MomentNote, MomentScripture } from '@moments/types';
 import { getSignedAudioUrl } from '../lib/audio';
 import { errorMessage } from '../lib/errors';
@@ -21,7 +13,6 @@ import type { EnrichmentType } from '../features/enrich/steps';
 import { useMomentDetail } from '../features/moment/useMomentDetail';
 import { EnrichmentDetail, type EnrichmentDetailData } from './EnrichmentDetail';
 import { formatDuration, formatLongDate } from '../lib/format';
-
 
 export interface PlayerScreenProps {
   momentId: string;
@@ -132,16 +123,18 @@ const noteTitles: Record<EnrichmentNoteKind, string> = {
 
 /** Strip HTML tags (e.g. api.bible's `<p>`, `<span>`) to render as plain text. */
 function stripHtml(html: string): string {
-  return html
-    // Remove verse-number spans entirely (e.g. <span class="v">1</span>).
-    .replace(/<span[^>]*class="v"[^>]*>.*?<\/span>/g, '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return (
+    html
+      // Remove verse-number spans entirely (e.g. <span class="v">1</span>).
+      .replace(/<span[^>]*class="v"[^>]*>.*?<\/span>/g, '')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
 }
 
 interface SheetItem {
@@ -153,10 +146,7 @@ function formatAddedAt(iso: string): string {
   return `Added ${formatLongDate(iso)}`;
 }
 
-function buildItems(
-  notes: MomentNote[],
-  scriptures: MomentScripture[],
-): SheetItem[] {
+function buildItems(notes: MomentNote[], scriptures: MomentScripture[]): SheetItem[] {
   const result: SheetItem[] = [];
 
   const recordingNotes = notes
@@ -241,8 +231,8 @@ export function PlayerScreen({
   useEffect(() => {
     // Configure the audio session for playback (not recording) so audio plays
     // in silent mode and routes through the speaker rather than the earpiece.
-    setAudioModeAsync({ playsInSilentMode: true, allowsRecording: false }).catch(
-      (err: unknown) => console.warn('Could not set audio mode', err),
+    setAudioModeAsync({ playsInSilentMode: true, allowsRecording: false }).catch((err: unknown) =>
+      console.warn('Could not set audio mode', err),
     );
   }, []);
 
@@ -291,11 +281,12 @@ export function PlayerScreen({
   const date = moment ? formatLongDate(moment.date) : '';
   const durationSeconds = status.duration > 0 ? status.duration : (moment?.audio?.duration ?? 0);
   // Notes written while recording become markers on the waveform.
-  const markers = durationSeconds > 0
-    ? notes
-        .filter((n) => n.timestamp !== undefined)
-        .map((n) => Math.min(1, (n.timestamp ?? 0) / durationSeconds))
-    : [];
+  const markers =
+    durationSeconds > 0
+      ? notes
+          .filter((n) => n.timestamp !== undefined)
+          .map((n) => Math.min(1, (n.timestamp ?? 0) / durationSeconds))
+      : [];
   const duration = formatDuration(durationSeconds);
   const currentTime = formatDuration(status.currentTime);
   const progress = durationSeconds > 0 ? Math.min(1, status.currentTime / durationSeconds) : 0;
@@ -326,11 +317,7 @@ export function PlayerScreen({
         >
           <BackIcon />
         </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Share"
-          style={styles.iconBtn}
-        >
+        <Pressable accessibilityRole="button" accessibilityLabel="Share" style={styles.iconBtn}>
           <ShareIcon />
         </Pressable>
       </View>
@@ -342,13 +329,7 @@ export function PlayerScreen({
       </View>
 
       <View style={styles.waveWrap}>
-        <Waveform
-          bars={bars}
-          height={200}
-          barWidth={2}
-          gap={2}
-          paddingHorizontal={28}
-        />
+        <Waveform bars={bars} height={200} barWidth={2} gap={2} paddingHorizontal={28} />
         <View style={[styles.progress, { width: `${progress * 100}%` }]} />
         {markers.map((position, i) => (
           <View key={i} style={[styles.marker, { left: `${position * 100}%` }]} />
@@ -387,9 +368,7 @@ export function PlayerScreen({
         </Pressable>
       </View>
 
-      {error ? (
-        <Text style={styles.errorText}>{error}</Text>
-      ) : null}
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <View style={styles.secondary}>
         <Text style={styles.secondaryText}>1x</Text>
@@ -408,10 +387,7 @@ export function PlayerScreen({
         onPressSection={(index) => setOpenDetail(items[index]?.detail ?? null)}
       />
 
-      <EnrichmentDetail
-        detail={openDetail}
-        onClose={() => setOpenDetail(null)}
-      />
+      <EnrichmentDetail detail={openDetail} onClose={() => setOpenDetail(null)} />
     </View>
   );
 }

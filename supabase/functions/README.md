@@ -4,9 +4,9 @@ Supabase Edge Functions (Deno) for the Moments platform.
 
 ## Functions
 
-| Function | Description |
-| --- | --- |
-| `bible` | Proxies api.bible so the API key never ships in the app. Validates every ID before building the upstream URL. |
+| Function     | Description                                                                                                                                                                   |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bible`      | Proxies api.bible so the API key never ships in the app. Validates every ID before building the upstream URL.                                                                 |
 | `transcribe` | Transcribes a moment's audio with Whisper and stores the transcript on `moments_audio`. Runs as the calling user, so row-level security decides what they can read and write. |
 
 Shared helpers (CORS, JSON responses, required env vars) live in `_shared/`.

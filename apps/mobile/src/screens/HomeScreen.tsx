@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { colors, fonts } from '@moments/ui';
@@ -122,7 +116,8 @@ export function HomeScreen({
 
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <Text style={styles.greeting}>
-          Welcome back,{'\n'}{greetingName}
+          Welcome back,{'\n'}
+          {greetingName}
         </Text>
         <View style={styles.headerActions}>
           <Pressable
@@ -144,10 +139,7 @@ export function HomeScreen({
         </View>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Record a moment"
@@ -164,11 +156,7 @@ export function HomeScreen({
 
         <View style={styles.recentHeader}>
           <Text style={styles.recentTitle}>Recent Moments</Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={onSeeAll}
-            style={styles.seeAll}
-          >
+          <Pressable accessibilityRole="button" onPress={onSeeAll} style={styles.seeAll}>
             <Text style={styles.seeAllText}>See all</Text>
           </Pressable>
         </View>
@@ -196,9 +184,7 @@ export function HomeScreen({
                   <Text style={styles.recentCardTitle} numberOfLines={1}>
                     {moment.title}
                   </Text>
-                  <Text style={styles.recentCardTime}>
-                    {formatRelativeDate(moment.date)}
-                  </Text>
+                  <Text style={styles.recentCardTime}>{formatRelativeDate(moment.date)}</Text>
                 </View>
                 <Chevron />
               </Pressable>

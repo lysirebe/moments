@@ -17,9 +17,7 @@
       "bundleIdentifier": "com.moments.app",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Moments uses the microphone to record audio for your Moments.",
-        "UIBackgroundModes": [
-          "audio"
-        ]
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {
@@ -28,9 +26,7 @@
         "backgroundColor": "#071F49"
       },
       "package": "com.moments.app",
-      "permissions": [
-        "RECORD_AUDIO"
-      ]
+      "permissions": ["RECORD_AUDIO"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -42,9 +42,7 @@ export function Tile({ label, selected, onPress }: TileProps) {
       ]}
     >
       {selected && <CheckBadge />}
-      <Text style={[styles.label, selected && styles.labelSelected]}>
-        {label}
-      </Text>
+      <Text style={[styles.label, selected && styles.labelSelected]}>{label}</Text>
     </Pressable>
   );
 }

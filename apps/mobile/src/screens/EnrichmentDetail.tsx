@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '@moments/ui';
 import { PaperGrain } from '@moments/ui';
@@ -39,39 +32,26 @@ export function EnrichmentDetail({ detail, onClose }: EnrichmentDetailProps) {
   const insets = useSafeAreaInsets();
 
   return (
-    <Modal
-      visible={Boolean(detail)}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <Modal visible={Boolean(detail)} animationType="slide" onRequestClose={onClose}>
       <View style={styles.container}>
         <PaperGrain opacity={0.35} />
 
         <View style={[styles.top, { paddingTop: insets.top + 16 }]}>
           <Text style={styles.label}>{detail?.label.toUpperCase()}</Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={onClose}
-            style={styles.close}
-          >
+          <Pressable accessibilityRole="button" onPress={onClose} style={styles.close}>
             <Text style={styles.closeText}>Done</Text>
           </Pressable>
         </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.content,
-            { paddingBottom: insets.bottom + 40 },
-          ]}
+          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40 }]}
         >
           {detail?.body ? (
             <View style={styles.card}>
               {detail.quote ? <Text style={styles.quote}>“</Text> : null}
               <Text style={styles.body}>{detail.body}</Text>
-              {detail.reference ? (
-                <Text style={styles.reference}>{detail.reference}</Text>
-              ) : null}
+              {detail.reference ? <Text style={styles.reference}>{detail.reference}</Text> : null}
             </View>
           ) : null}
 

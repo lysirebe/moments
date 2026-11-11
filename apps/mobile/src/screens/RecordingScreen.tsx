@@ -46,13 +46,7 @@ function PauseIcon() {
 function StopIcon() {
   return (
     <Svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <Circle
-        cx="12"
-        cy="12"
-        r="9"
-        stroke={colors.recordingControl}
-        strokeWidth="1.8"
-      />
+      <Circle cx="12" cy="12" r="9" stroke={colors.recordingControl} strokeWidth="1.8" />
       <Circle cx="12" cy="12" r="4" fill={colors.recordingControl} />
     </Svg>
   );
@@ -119,9 +113,7 @@ export function RecordingScreen({ onBack, onAddNote, onStop }: RecordingScreenPr
 
   useEffect(() => {
     if (status !== 'idle') return;
-    start().catch((err: unknown) =>
-      setError(errorMessage(err, 'Could not start recording.')),
-    );
+    start().catch((err: unknown) => setError(errorMessage(err, 'Could not start recording.')));
     // Start once when the screen opens; later status changes are user-driven.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -214,7 +206,6 @@ export function RecordingScreen({ onBack, onAddNote, onStop }: RecordingScreenPr
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

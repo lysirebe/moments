@@ -43,9 +43,7 @@ export function toAudioAsset(row: AudioRow): AudioAsset {
 export function toMoment(
   row: MomentRow & { moments_audio?: AudioRow | AudioRow[] | null },
 ): Moment {
-  const audioRow = Array.isArray(row.moments_audio)
-    ? row.moments_audio[0]
-    : row.moments_audio;
+  const audioRow = Array.isArray(row.moments_audio) ? row.moments_audio[0] : row.moments_audio;
 
   return {
     id: row.id,

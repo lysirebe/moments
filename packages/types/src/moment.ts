@@ -10,13 +10,7 @@ import type { AudioAsset } from './audio';
 
 /** The type of gathering or setting a Moment was captured in. */
 export type MomentType =
-  | 'quiet_time'
-  | 'prayer'
-  | 'living_room'
-  | 'conference'
-  | 'spontaneous'
-  | 'worship'
-  | 'other';
+  'quiet_time' | 'prayer' | 'living_room' | 'conference' | 'spontaneous' | 'worship' | 'other';
 
 /** A person who was present during a Moment. */
 export interface MomentPerson {
@@ -45,10 +39,7 @@ export interface MomentScripture {
 /** The kind of note attached to a Moment. */
 export type MomentNoteKind =
   /** A timestamped note typed while recording. */
-  | 'note'
-  | 'prayer'
-  | 'revelation'
-  | 'reflection';
+  'note' | 'prayer' | 'revelation' | 'reflection';
 
 /** A note attached to a Moment. */
 export interface MomentNote {

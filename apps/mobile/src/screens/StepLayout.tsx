@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '@moments/ui';
 import { StepDots, PaperGrain } from '@moments/ui';
@@ -60,19 +54,11 @@ export function StepLayout({
         )}
 
         <View style={[styles.topActions, !showDots && styles.topActionsFlush]}>
-          <Pressable
-            accessibilityRole="button"
-            onPress={onBack}
-            style={styles.action}
-          >
+          <Pressable accessibilityRole="button" onPress={onBack} style={styles.action}>
             <Text style={styles.actionText}>Back</Text>
           </Pressable>
           {onSave && (
-            <Pressable
-              accessibilityRole="button"
-              onPress={onSave}
-              style={styles.action}
-            >
+            <Pressable accessibilityRole="button" onPress={onSave} style={styles.action}>
               <Text style={styles.actionText}>Save</Text>
             </Pressable>
           )}

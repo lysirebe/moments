@@ -64,14 +64,11 @@ Deno.serve(async (req) => {
     form.append('file', file, audio.file_name ?? 'audio.m4a');
     form.append('model', 'whisper-1');
 
-    const whisperRes = await fetch(
-      'https://api.openai.com/v1/audio/transcriptions',
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
-        body: form,
-      },
-    );
+    const whisperRes = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+      body: form,
+    });
 
     if (!whisperRes.ok) {
       return json({ error: `Transcription failed (${whisperRes.status})` }, 502);

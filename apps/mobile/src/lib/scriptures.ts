@@ -13,9 +13,7 @@ export interface CreateScriptureInput {
   note?: string;
 }
 
-export async function createScripture(
-  input: CreateScriptureInput,
-): Promise<MomentScripture> {
+export async function createScripture(input: CreateScriptureInput): Promise<MomentScripture> {
   const { data, error } = await supabase
     .from('moment_scriptures')
     .insert({

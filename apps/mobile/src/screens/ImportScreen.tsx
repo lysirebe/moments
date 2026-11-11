@@ -133,9 +133,7 @@ export function ImportScreen({
       ) : null}
 
       <View style={styles.handWrap}>
-        <Text style={styles.hand}>
-          imported Moments stay private until you share them.
-        </Text>
+        <Text style={styles.hand}>imported Moments stay private until you share them.</Text>
       </View>
 
       <View style={[styles.nav, { paddingBottom: insets.bottom + 8 }]}>

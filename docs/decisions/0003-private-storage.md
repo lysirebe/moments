@@ -1,6 +1,7 @@
 # ADR-0003: Private storage with signed URLs
 
 ## Status
+
 Accepted
 
 ## Context

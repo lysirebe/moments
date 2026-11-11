@@ -2,8 +2,7 @@
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 /** Returns a JSON response with CORS headers. */
@@ -16,9 +15,7 @@ export function json(body: unknown, status = 200): Response {
 
 /** Handles the CORS preflight request, or returns `null` for other methods. */
 export function handlePreflight(req: Request): Response | null {
-  return req.method === 'OPTIONS'
-    ? new Response('ok', { headers: corsHeaders })
-    : null;
+  return req.method === 'OPTIONS' ? new Response('ok', { headers: corsHeaders }) : null;
 }
 
 /** Reads a required environment variable, failing loudly at cold start. */

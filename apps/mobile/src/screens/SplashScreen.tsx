@@ -1,10 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-} from 'react-native';
+import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '@moments/ui';
 import { DoorScene } from '@moments/ui';
@@ -37,12 +32,7 @@ export function SplashScreen({ onEnter }: SplashScreenProps) {
       style={styles.container}
     >
       <DoorScene width={393} height={852} />
-      <Animated.View
-        style={[
-          styles.tap,
-          { bottom: insets.bottom + 62, opacity: tapOpacity },
-        ]}
-      >
+      <Animated.View style={[styles.tap, { bottom: insets.bottom + 62, opacity: tapOpacity }]}>
         <Text style={styles.tapText}>tap to enter</Text>
       </Animated.View>
     </Pressable>

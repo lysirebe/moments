@@ -58,13 +58,7 @@ const TAP_SLOP = 6;
 /** Flick speed (points/ms) that decides direction regardless of distance. */
 const FLICK_VELOCITY = 0.3;
 
-function SectionIcon({
-  type,
-  small,
-}: {
-  type: PlayerSheetSection['type'];
-  small?: boolean;
-}) {
+function SectionIcon({ type, small }: { type: PlayerSheetSection['type']; small?: boolean }) {
   return (
     <View style={[styles.iconCircle, small && styles.iconCircleSmall]}>
       <Text style={[styles.iconGlyph, small && styles.iconGlyphSmall]}>
@@ -118,13 +112,9 @@ export function PlayerSheet({
   const menuHeight = (addOptions?.length ?? 0) * MENU_ITEM_HEIGHT + 12;
   const menuPosition = anchor
     ? {
-        right: Math.max(
-          SCREEN_MARGIN,
-          screen.width - (anchor.x + anchor.width),
-        ),
+        right: Math.max(SCREEN_MARGIN, screen.width - (anchor.x + anchor.width)),
         // Open upwards when there isn't room below the button.
-        ...(anchor.y + anchor.height + MENU_GAP + menuHeight >
-        screen.height - SCREEN_MARGIN
+        ...(anchor.y + anchor.height + MENU_GAP + menuHeight > screen.height - SCREEN_MARGIN
           ? { bottom: screen.height - anchor.y + MENU_GAP }
           : { top: anchor.y + anchor.height + MENU_GAP }),
       }
@@ -188,10 +178,7 @@ export function PlayerSheet({
 
   return (
     <Animated.View
-      style={[
-        styles.sheet,
-        { height: SHEET_HEIGHT, transform: [{ translateY: translate }] },
-      ]}
+      style={[styles.sheet, { height: SHEET_HEIGHT, transform: [{ translateY: translate }] }]}
     >
       <View {...panResponder.panHandlers}>
         <View
@@ -233,11 +220,7 @@ export function PlayerSheet({
         {menuPosition && (
           <View
             accessibilityRole="menu"
-            style={[
-              styles.menu,
-              menuPosition,
-              { maxHeight: screen.height - SCREEN_MARGIN * 2 },
-            ]}
+            style={[styles.menu, menuPosition, { maxHeight: screen.height - SCREEN_MARGIN * 2 }]}
           >
             <ScrollView bounces={false}>
               {addOptions?.map((option) => (
@@ -245,10 +228,7 @@ export function PlayerSheet({
                   key={option.type}
                   accessibilityRole="menuitem"
                   onPress={() => handleSelectOption(option.type)}
-                  style={({ pressed }) => [
-                    styles.menuItem,
-                    pressed && styles.menuItemPressed,
-                  ]}
+                  style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
                 >
                   <SectionIcon type={option.type} small />
                   <Text style={styles.menuItemText} numberOfLines={1}>
@@ -261,14 +241,9 @@ export function PlayerSheet({
         )}
       </Modal>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         {sections.length === 0 ? (
-          <Text style={styles.empty}>
-            Nothing added yet. Tap Add more to enrich this Moment.
-          </Text>
+          <Text style={styles.empty}>Nothing added yet. Tap Add more to enrich this Moment.</Text>
         ) : null}
         {sections.map((section, index) => (
           <Pressable
@@ -277,10 +252,7 @@ export function PlayerSheet({
             accessibilityLabel={`Open ${section.title}`}
             disabled={!onPressSection}
             onPress={() => onPressSection?.(index)}
-            style={({ pressed }) => [
-              styles.section,
-              pressed && styles.sectionPressed,
-            ]}
+            style={({ pressed }) => [styles.section, pressed && styles.sectionPressed]}
           >
             <SectionIcon type={section.type} />
             <View style={styles.sectionBody}>

@@ -3,12 +3,14 @@
 ## Options
 
 ### expo-audio
+
 - **Pros:** Current Expo audio API, works in Expo Go, supports recording and
   playback. Replaces the deprecated `expo-av`.
 - **Cons:** Limited background playback and lock-screen controls.
 - **Use for:** P1 recording and in-app playback.
 
 ### react-native-track-player
+
 - **Pros:** Full background playback, lock-screen controls, media session.
 - **Cons:** Requires a dev build (not Expo Go), more complex setup.
 - **Use for:** P2 background playback.

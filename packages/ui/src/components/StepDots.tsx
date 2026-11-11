@@ -20,12 +20,7 @@ export function StepDots({ total, current }: StepDotsProps) {
         return (
           <React.Fragment key={index}>
             {index > 0 && <View style={styles.line} />}
-            <View
-              style={[
-                styles.dot,
-                isActive ? styles.dotActive : styles.dotEmpty,
-              ]}
-            />
+            <View style={[styles.dot, isActive ? styles.dotActive : styles.dotEmpty]} />
           </React.Fragment>
         );
       })}

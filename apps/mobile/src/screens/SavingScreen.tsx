@@ -39,7 +39,11 @@ export function SavingScreen({ save, onDone, onCancel }: SavingScreenProps) {
     barWidth.setValue(0);
     const animation = Animated.parallel([
       Animated.timing(progress, { toValue: 1, duration: MIN_DURATION_MS, useNativeDriver: false }),
-      Animated.timing(barWidth, { toValue: 120, duration: MIN_DURATION_MS, useNativeDriver: false }),
+      Animated.timing(barWidth, {
+        toValue: 120,
+        duration: MIN_DURATION_MS,
+        useNativeDriver: false,
+      }),
     ]);
     animation.start();
 
@@ -68,9 +72,7 @@ export function SavingScreen({ save, onDone, onCancel }: SavingScreenProps) {
         </Animated.View>
       </View>
 
-      <Text style={styles.title}>
-        {error ? 'Something went wrong' : 'Saving your Moment'}
-      </Text>
+      <Text style={styles.title}>{error ? 'Something went wrong' : 'Saving your Moment'}</Text>
 
       {error ? (
         <>

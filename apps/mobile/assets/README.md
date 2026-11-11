@@ -12,9 +12,9 @@ npx expo prebuild --clean
 
 Or drop in your own images. Recommended sizes:
 
-| File | Size |
-| --- | --- |
-| `icon.png` | 1024 × 1024 |
+| File                | Size        |
+| ------------------- | ----------- |
+| `icon.png`          | 1024 × 1024 |
 | `adaptive-icon.png` | 1024 × 1024 |
-| `splash.png` | 1284 × 2778 |
-| `favicon.png` | 48 × 48 |
+| `splash.png`        | 1284 × 2778 |
+| `favicon.png`       | 48 × 48     |

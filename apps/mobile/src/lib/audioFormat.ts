@@ -14,10 +14,7 @@ const AUDIO_EXTENSIONS: Record<string, AudioFormat> = {
  * Detects the audio format of a file from its name and/or MIME type.
  * Returns `null` when the format is not supported.
  */
-export function detectAudioFormat(
-  fileName: string,
-  mimeType?: string,
-): AudioFormat | null {
+export function detectAudioFormat(fileName: string, mimeType?: string): AudioFormat | null {
   const ext = fileName.split('.').pop()?.toLowerCase();
   if (ext && AUDIO_EXTENSIONS[ext]) {
     return AUDIO_EXTENSIONS[ext];

@@ -6,22 +6,10 @@
  * keeps the same export names.
  */
 
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 type MomentType =
-  | 'quiet_time'
-  | 'prayer'
-  | 'living_room'
-  | 'conference'
-  | 'spontaneous'
-  | 'worship'
-  | 'other';
+  'quiet_time' | 'prayer' | 'living_room' | 'conference' | 'spontaneous' | 'worship' | 'other';
 
 type AudioFormat = 'm4a' | 'mp3' | 'wav' | 'aac' | 'ogg';
 

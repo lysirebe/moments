@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import {
   RecordingPresets,
   requestRecordingPermissionsAsync,
@@ -48,9 +41,7 @@ interface RecordingSessionValue {
   reset: () => Promise<void>;
 }
 
-const RecordingSessionContext = createContext<RecordingSessionValue | undefined>(
-  undefined,
-);
+const RecordingSessionContext = createContext<RecordingSessionValue | undefined>(undefined);
 
 /** How often the recorder reports elapsed time, in milliseconds. */
 const STATUS_INTERVAL_MS = 100;
@@ -158,8 +149,7 @@ export function RecordingSessionProvider({ children }: { children: React.ReactNo
     [recorder, status, stoppedDuration, notes],
   );
 
-  const elapsed =
-    status === 'stopped' ? stoppedDuration : recorderState.durationMillis / 1000;
+  const elapsed = status === 'stopped' ? stoppedDuration : recorderState.durationMillis / 1000;
 
   const value = useMemo<RecordingSessionValue>(
     () => ({
@@ -176,7 +166,20 @@ export function RecordingSessionProvider({ children }: { children: React.ReactNo
       save,
       reset,
     }),
-    [status, recorderState, elapsed, notes, lastNoteAddedAt, start, pause, resume, stop, addNote, save, reset],
+    [
+      status,
+      recorderState,
+      elapsed,
+      notes,
+      lastNoteAddedAt,
+      start,
+      pause,
+      resume,
+      stop,
+      addNote,
+      save,
+      reset,
+    ],
   );
 
   return (

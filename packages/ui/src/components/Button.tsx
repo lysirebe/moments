@@ -41,12 +41,7 @@ const labelColors: Record<ButtonVariant, string> = {
   danger: colors.white,
 };
 
-export function Button({
-  label,
-  variant = 'primary',
-  style,
-  ...rest
-}: ButtonProps) {
+export function Button({ label, variant = 'primary', style, ...rest }: ButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -58,9 +53,7 @@ export function Button({
       ]}
       {...rest}
     >
-      <Text style={[styles.label, { color: labelColors[variant] }]}>
-        {label}
-      </Text>
+      <Text style={[styles.label, { color: labelColors[variant] }]}>{label}</Text>
     </Pressable>
   );
 }

@@ -40,24 +40,13 @@ export function MomentsLogo({
         });
 
   return (
-    <Svg
-      width={width}
-      height={height}
-      viewBox="0 0 430 177"
-      fill="none"
-      strokeLinejoin="round"
-    >
+    <Svg width={width} height={height} viewBox="0 0 430 177" fill="none" strokeLinejoin="round">
       <Defs>
         <ClipPath id="momentsLogoFill">
           <AnimatedRect x="0" y="0" width={clipWidth} height="177" />
         </ClipPath>
       </Defs>
-      <Path
-        d={LOGO_PATH}
-        fill="none"
-        stroke={color}
-        strokeWidth={strokeWidth}
-      />
+      <Path d={LOGO_PATH} fill="none" stroke={color} strokeWidth={strokeWidth} />
       <Path
         d={LOGO_PATH}
         fill={color}
