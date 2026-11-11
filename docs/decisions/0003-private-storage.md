@@ -22,4 +22,6 @@ Use **Supabase Storage** with **private buckets** and **signed URLs**.
 - Files are private by default — no public URLs.
 - Signed URLs expire, so they are not shareable indefinitely.
 - Streaming requires a round-trip to generate a signed URL.
-- The `signed-url` edge function generates signed URLs server-side.
+- Signed URLs are created by the client with the user's own session, so
+  storage RLS decides what can be signed. An earlier `signed-url` edge function
+  used the service-role key without an ownership check and was removed.

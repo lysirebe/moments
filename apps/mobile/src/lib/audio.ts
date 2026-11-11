@@ -10,6 +10,7 @@ import {
 import * as DocumentPicker from 'expo-document-picker';
 import type { AudioAsset, AudioFormat } from '@moments/types';
 
+import { AUDIO_BUCKET } from './storage';
 import { supabase } from './supabase';
 
 export interface RecordingResult {
@@ -211,24 +212,21 @@ export async function getAudioDuration(uri: string): Promise<number> {
   });
 }
 
-const SIGNED_URL_FUNCTION = 'signed-url';
-const AUDIO_BUCKET = 'audio';
+/** How long a signed playback URL stays valid, in seconds. */
+const SIGNED_URL_TTL_SECONDS = 60 * 60;
 
 /**
- * Requests a short-lived signed URL for a private audio object so it can be
- * streamed by the audio player. Files stay private; the client never gets a
- * permanent URL.
+ * Creates a short-lived signed URL for a private audio object so it can be
+ * streamed by the audio player. Storage RLS only signs objects in the caller's
+ * own `<user_id>/` folder, so the client never gets a permanent or foreign URL.
  */
 export async function getSignedAudioUrl(path: string): Promise<string> {
-  const { data, error } = await supabase.functions.invoke<{ signedUrl: string }>(
-    SIGNED_URL_FUNCTION,
-    {
-      body: { bucket: AUDIO_BUCKET, path },
-    },
-  );
+  const { data, error } = await supabase.storage
+    .from(AUDIO_BUCKET)
+    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
 
   if (error || !data) {
-    throw new Error(error?.message || 'Failed to get a signed audio URL');
+    throw new Error(error?.message ?? 'Failed to get a signed audio URL');
   }
 
   return data.signedUrl;
