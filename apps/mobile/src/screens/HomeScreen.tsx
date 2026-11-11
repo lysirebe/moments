@@ -11,9 +11,9 @@ import Svg, { Path } from 'react-native-svg';
 import { colors, fonts } from '@moments/ui';
 import { Orb, BottomNav, PaperGrain } from '@moments/ui';
 import { useAuth } from '../features/auth/AuthProvider';
+import { useMoments } from '../features/moment/useMoments';
 import { getProfile } from '../lib/profile';
-import { listMoments } from '../lib/moments';
-import type { Moment } from '@moments/types';
+import { formatRelativeDate } from '../lib/format';
 
 export interface HomeScreenProps {
   onRecord: () => void;
@@ -66,28 +66,6 @@ function SignOutIcon() {
   );
 }
 
-/** Formats an ISO date string into a short, human-friendly label. */
-function formatMomentDate(date: string): string {
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return date;
-
-  const today = new Date();
-  const isToday =
-    d.getFullYear() === today.getFullYear() &&
-    d.getMonth() === today.getMonth() &&
-    d.getDate() === today.getDate();
-
-  if (isToday) {
-    return `Today, ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
-  }
-
-  return d.toLocaleDateString([], {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
 function Chevron() {
   return (
     <Svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -114,37 +92,26 @@ export function HomeScreen({
   onSignOut,
 }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
-  const { session, signOut } = useAuth();
+  const { session } = useAuth();
+  const userId = session?.user.id;
+  const { moments, error } = useMoments();
   const [displayName, setDisplayName] = useState<string | null>(null);
-  const [moments, setMoments] = useState<Moment[]>([]);
 
   useEffect(() => {
-    const userId = session?.user?.id;
     if (!userId) return;
-
     let active = true;
     getProfile(userId)
       .then((profile) => {
-        if (active && profile?.display_name) {
-          setDisplayName(profile.display_name);
-        }
+        if (active) setDisplayName(profile?.displayName ?? null);
       })
-      .catch(() => {
-        // Ignore profile fetch errors; fall back to a generic greeting.
+      .catch((err: unknown) => {
+        // Not fatal: the greeting falls back to a generic name.
+        console.warn('Could not load profile', err);
       });
-
-    listMoments(userId)
-      .then((data) => {
-        if (active) setMoments(data);
-      })
-      .catch(() => {
-        // Ignore moment fetch errors; show an empty Recent Moments row.
-      });
-
     return () => {
       active = false;
     };
-  }, [session]);
+  }, [userId]);
 
   const greetingName = displayName ?? 'friend';
   const recentMoments = moments.slice(0, 3);
@@ -211,7 +178,9 @@ export function HomeScreen({
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.recentRow}
         >
-          {recentMoments.length === 0 ? (
+          {error ? (
+            <Text style={styles.recentEmpty}>{error}</Text>
+          ) : recentMoments.length === 0 ? (
             <Text style={styles.recentEmpty}>
               No moments yet. Press the orb to record your first one.
             </Text>
@@ -228,7 +197,7 @@ export function HomeScreen({
                     {moment.title}
                   </Text>
                   <Text style={styles.recentCardTime}>
-                    {formatMomentDate(moment.date)}
+                    {formatRelativeDate(moment.date)}
                   </Text>
                 </View>
                 <Chevron />

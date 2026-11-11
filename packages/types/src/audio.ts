@@ -33,12 +33,3 @@ export interface AudioAsset {
   /** The transcription text, if available. */
   transcript?: string;
 }
-
-/** The status of an audio upload. */
-export type AudioUploadStatus =
-  | 'idle'
-  | 'recording'
-  | 'uploading'
-  | 'processing'
-  | 'ready'
-  | 'error';

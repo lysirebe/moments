@@ -12,24 +12,12 @@ import Svg, { Path } from 'react-native-svg';
 import { colors, fonts, makeMiniBars } from '@moments/ui';
 import { Waveform, PaperGrain } from '@moments/ui';
 import { pickAudioFile, type SelectedAudioFile } from '../lib/audio';
+import { formatDuration, formatFileSize } from '../lib/format';
 
 export interface ImportDetailsScreenProps {
   file: SelectedAudioFile;
   onBack: () => void;
   onImport: (file: SelectedAudioFile, title: string) => void;
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
-
-function formatSize(bytes?: number): string {
-  if (!bytes) return '';
-  const mb = bytes / (1024 * 1024);
-  if (mb >= 1) return `${mb.toFixed(1)} MB`;
-  return `${Math.round(bytes / 1024)} KB`;
 }
 
 function BackIcon() {
@@ -61,7 +49,7 @@ export function ImportDetailsScreen({ file, onBack, onImport }: ImportDetailsScr
     minHeight: 3,
   });
 
-  const meta = [formatDuration(selected.duration), formatSize(selected.size)]
+  const meta = [formatDuration(selected.duration), formatFileSize(selected.size)]
     .filter(Boolean)
     .join(' · ');
 
