@@ -14,10 +14,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts, radii } from '@moments/ui';
 import { PaperGrain, PillButton } from '@moments/ui';
 import { useAuth } from '../features/auth/AuthProvider';
+import { errorMessage } from '../lib/errors';
 
 export interface SignInUpScreenProps {
   onBack: () => void;
-  onAuthenticated: () => void;
 }
 
 /**
@@ -28,7 +28,11 @@ export interface SignInUpScreenProps {
  * Wired to Supabase: pressing Continue tries to create an account first, and
  * falls back to signing in if the email is already registered.
  */
-export function SignInUpScreen({ onBack, onAuthenticated }: SignInUpScreenProps) {
+/**
+ * Sign in / sign up. On success the auth state changes and the navigator swaps
+ * to the signed-in screens, so there is nothing to navigate to here.
+ */
+export function SignInUpScreen({ onBack }: SignInUpScreenProps) {
   const insets = useSafeAreaInsets();
   const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState<'signin' | 'signup'>('signup');
@@ -38,6 +42,7 @@ export function SignInUpScreen({ onBack, onAuthenticated }: SignInUpScreenProps)
   const [confirm, setConfirm] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const isSignUp = mode === 'signup';
 
@@ -56,17 +61,19 @@ export function SignInUpScreen({ onBack, onAuthenticated }: SignInUpScreenProps)
 
     setSubmitting(true);
     setError(null);
+    setNotice(null);
     try {
       if (isSignUp) {
-        await signUp(email.trim(), password, name.trim());
+        const { needsConfirmation } = await signUp(email.trim(), password, name.trim());
+        if (needsConfirmation) {
+          setNotice('Check your email to confirm your account, then sign in.');
+          setMode('signin');
+        }
       } else {
         await signIn(email.trim(), password);
       }
-      onAuthenticated();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Something went wrong. Please try again.';
-      setError(message);
+      setError(errorMessage(err, 'Something went wrong. Please try again.'));
     } finally {
       setSubmitting(false);
     }
@@ -184,6 +191,7 @@ export function SignInUpScreen({ onBack, onAuthenticated }: SignInUpScreenProps)
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
         {error ? <Text style={styles.error}>{error}</Text> : null}
+        {notice ? <Text style={styles.notice}>{notice}</Text> : null}
         <PillButton
           label={submitting ? 'Please wait…' : isSignUp ? 'Create account' : 'Sign in'}
           onPress={handleSubmit}
@@ -279,6 +287,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.ui,
     fontSize: 13,
     color: colors.danger,
+    textAlign: 'center',
+  },
+  notice: {
+    fontFamily: fonts.ui,
+    fontSize: 13,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   spinner: {

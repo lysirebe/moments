@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,16 +13,14 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { colors, fonts, makeMiniBars } from '@moments/ui';
 import { PlayerCard, NoteRow, PaperGrain } from '@moments/ui';
 
-export interface ReviewScreenProps {
-  onBack: () => void;
-  onSave: () => void;
-}
+import { useRecordingSession } from '../features/recording/RecordingSessionProvider';
+import { formatDuration } from '../lib/format';
 
-const notes = [
-  { time: '04:32', text: 'Peace over the exam' },
-  { time: '08:17', text: 'Thank you for today' },
-  { time: '11:08', text: 'Guide my steps' },
-];
+export interface ReviewScreenProps {
+  /** Called after the user confirms discarding the recording. */
+  onDiscard: () => void;
+  onSave: (title: string) => void;
+}
 
 function BackIcon() {
   return (
@@ -51,11 +50,28 @@ function CheckIcon() {
   );
 }
 
+/** e.g. "Saturday morning Moment", used when the user leaves the title blank. */
+function defaultTitle(now: Date = new Date()): string {
+  const day = now.toLocaleDateString('en-GB', { weekday: 'long' });
+  const hour = now.getHours();
+  const part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+  return `${day} ${part} Moment`;
+}
+
 /**
  * Review (S5.dc.html): editable title, compact player, notes list, Save Moment.
  */
-export function ReviewScreen({ onBack, onSave }: ReviewScreenProps) {
+export function ReviewScreen({ onDiscard, onSave }: ReviewScreenProps) {
   const insets = useSafeAreaInsets();
+  const { elapsed, notes, reset } = useRecordingSession();
+  const [title, setTitle] = useState('');
+
+  const handleBack = () => {
+    Alert.alert('Discard this recording?', 'Your audio and notes will not be saved.', [
+      { text: 'Keep it', style: 'cancel' },
+      { text: 'Discard', style: 'destructive', onPress: () => void reset().then(onDiscard) },
+    ]);
+  };
   const bars = makeMiniBars(44, 36, 3, colors.playerBar, {
     wave: 4,
     minHeight: 3,
@@ -68,7 +84,7 @@ export function ReviewScreen({ onBack, onSave }: ReviewScreenProps) {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Back"
-        onPress={onBack}
+        onPress={handleBack}
         style={[styles.back, { top: insets.top + 16 }]}
       >
         <BackIcon />
@@ -82,23 +98,32 @@ export function ReviewScreen({ onBack, onSave }: ReviewScreenProps) {
         ]}
       >
         <TextInput
-          placeholder="Title"
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Name this Moment"
           placeholderTextColor={colors.reviewTitle}
-          defaultValue="Saturday morning worship"
+          accessibilityLabel="Title"
           style={styles.title}
         />
 
         <View style={styles.player}>
-          <PlayerCard duration="12:46" bars={bars} />
+          <PlayerCard duration={formatDuration(elapsed)} bars={bars} />
         </View>
 
-        <Text style={styles.overline}>NOTES SAVED</Text>
-
-        <View style={styles.notes}>
-          {notes.map((note) => (
-            <NoteRow key={note.time} time={note.time} text={note.text} />
-          ))}
-        </View>
+        {notes.length > 0 ? (
+          <>
+            <Text style={styles.overline}>NOTES SAVED</Text>
+            <View style={styles.notes}>
+              {notes.map((note) => (
+                <NoteRow
+                  key={note.id}
+                  time={formatDuration(note.timestamp)}
+                  text={note.content}
+                />
+              ))}
+            </View>
+          </>
+        ) : null}
       </ScrollView>
 
       <View style={[styles.saveWrap, { bottom: insets.bottom + 56 }]}>
@@ -106,7 +131,7 @@ export function ReviewScreen({ onBack, onSave }: ReviewScreenProps) {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Save Moment"
-          onPress={onSave}
+          onPress={() => onSave(title.trim() || defaultTitle())}
           style={styles.saveOrb}
         >
           <CheckIcon />

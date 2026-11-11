@@ -5,19 +5,19 @@ import Svg, { Path } from 'react-native-svg';
 import { colors, fonts } from '@moments/ui';
 import { Tile, PaperGrain } from '@moments/ui';
 
+import {
+  ENRICHMENT_LABELS,
+  ENRICHMENT_ORDER,
+  orderSelection,
+  type EnrichmentType,
+} from '../features/enrich/steps';
+
 export interface EnrichScreenProps {
   onBack: () => void;
-  onContinue: (selected: string[]) => void;
+  /** Called with the chosen enrichments, in wizard order. */
+  onContinue: (selected: EnrichmentType[]) => void;
   onLater: () => void;
 }
-
-const options = [
-  'Scripture',
-  'Prayer',
-  'Revelation',
-  'Favourite Moment',
-  'Reflection',
-];
 
 function BackIcon() {
   return (
@@ -38,17 +38,15 @@ function BackIcon() {
  */
 export function EnrichScreen({ onBack, onContinue, onLater }: EnrichScreenProps) {
   const insets = useSafeAreaInsets();
-  const [selected, setSelected] = useState<string[]>([
-    'Scripture',
-    'Prayer',
-    'Revelation',
+  const [selected, setSelected] = useState<EnrichmentType[]>([
+    'scripture',
+    'prayer',
+    'revelation',
   ]);
 
-  const toggle = (label: string) => {
+  const toggle = (type: EnrichmentType) => {
     setSelected((prev) =>
-      prev.includes(label)
-        ? prev.filter((l) => l !== label)
-        : [...prev, label],
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
 
@@ -74,12 +72,12 @@ export function EnrichScreen({ onBack, onContinue, onLater }: EnrichScreenProps)
         </Text>
 
         <View style={styles.grid}>
-          {options.map((label) => (
+          {ENRICHMENT_ORDER.map((type) => (
             <Tile
-              key={label}
-              label={label}
-              selected={selected.includes(label)}
-              onPress={() => toggle(label)}
+              key={type}
+              label={ENRICHMENT_LABELS[type]}
+              selected={selected.includes(type)}
+              onPress={() => toggle(type)}
             />
           ))}
         </View>
@@ -88,8 +86,9 @@ export function EnrichScreen({ onBack, onContinue, onLater }: EnrichScreenProps)
       <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
         <Pressable
           accessibilityRole="button"
-          onPress={() => onContinue(selected)}
-          style={styles.continue}
+          onPress={() => onContinue(orderSelection(selected))}
+          disabled={selected.length === 0}
+          style={[styles.continue, selected.length === 0 && styles.continueDisabled]}
         >
           <Text style={styles.continueText}>Continue with selected</Text>
         </Pressable>
@@ -165,5 +164,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.uiMedium,
     fontSize: 15,
     color: colors.enrichLater,
+  },
+  continueDisabled: {
+    opacity: 0.5,
   },
 });

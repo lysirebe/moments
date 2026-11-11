@@ -1,47 +1,57 @@
-import React from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts, radii } from '@moments/ui';
 
+import { useRecordingSession } from '../features/recording/RecordingSessionProvider';
+import { formatDuration } from '../lib/format';
+
 export interface AddNoteScreenProps {
+  /** Position in the recording the note is pinned to, in seconds. */
+  timestamp: number;
   onClose: () => void;
   onSave: () => void;
 }
 
 /**
  * Add-Note (S4.dc.html): a note sheet over the recorder with a live timer, the
- * captured timestamp, and a ruled journal textarea.
+ * captured timestamp, and a ruled journal textarea. The recording keeps running
+ * underneath while the sheet is open.
  */
-export function AddNoteScreen({ onClose, onSave }: AddNoteScreenProps) {
+export function AddNoteScreen({ timestamp, onClose, onSave }: AddNoteScreenProps) {
   const insets = useSafeAreaInsets();
+  const { elapsed, status, addNote } = useRecordingSession();
+  const [content, setContent] = useState('');
+  const canSave = content.trim().length > 0;
+
+  const handleSave = () => {
+    if (!canSave) return;
+    addNote(content, timestamp);
+    onSave();
+  };
 
   return (
     <View style={[styles.sheet, { paddingBottom: insets.bottom + 24 }]}>
       <View style={styles.grabber} />
 
       <View style={styles.header}>
-        <Text style={styles.recording}>Recording 04:32</Text>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onClose}
-          style={styles.close}
-        >
+        <Text style={styles.recording}>
+          {status === 'paused' ? 'Paused' : 'Recording'} {formatDuration(elapsed)}
+        </Text>
+        <Pressable accessibilityRole="button" onPress={onClose} style={styles.close}>
           <Text style={styles.closeText}>Close</Text>
         </Pressable>
       </View>
 
       <View style={styles.atRow}>
-        <Text style={styles.at}>at 04:32</Text>
+        <Text style={styles.at}>at {formatDuration(timestamp)}</Text>
       </View>
 
       <TextInput
         multiline
+        autoFocus
+        value={content}
+        onChangeText={setContent}
         placeholder="Type what's on your heart..."
         placeholderTextColor={colors.noteSheetPlaceholder}
         style={styles.input}
@@ -50,8 +60,10 @@ export function AddNoteScreen({ onClose, onSave }: AddNoteScreenProps) {
 
       <Pressable
         accessibilityRole="button"
-        onPress={onSave}
-        style={styles.save}
+        accessibilityState={{ disabled: !canSave }}
+        disabled={!canSave}
+        onPress={handleSave}
+        style={[styles.save, !canSave && styles.saveDisabled]}
       >
         <Text style={styles.saveText}>Save note</Text>
       </Pressable>
@@ -123,5 +135,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.uiMedium,
     fontSize: 15,
     color: colors.white,
+  },
+  saveDisabled: {
+    opacity: 0.5,
   },
 });

@@ -7,6 +7,7 @@ import { useMomentsFonts } from '@moments/ui';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { ThemeProvider } from './src/theme/ThemeProvider';
 import { AuthProvider } from './src/features/auth/AuthProvider';
+import { RecordingSessionProvider } from './src/features/recording/RecordingSessionProvider';
 
 export default function App() {
   const [fontsLoaded, fontError] = useMomentsFonts();
@@ -19,10 +20,12 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
-          <NavigationContainer>
-            <StatusBar style="light" />
-            <RootNavigator />
-          </NavigationContainer>
+          <RecordingSessionProvider>
+            <NavigationContainer>
+              <StatusBar style="light" />
+              <RootNavigator />
+            </NavigationContainer>
+          </RecordingSessionProvider>
         </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>
