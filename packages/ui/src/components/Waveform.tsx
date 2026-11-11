@@ -39,13 +39,7 @@ export function Waveform({
   style,
 }: WaveformProps) {
   return (
-    <View
-      style={[
-        styles.container,
-        { height, paddingHorizontal, gap },
-        style,
-      ]}
-    >
+    <View style={[styles.container, { height, paddingHorizontal, gap }, style]}>
       {bars.map((bar, index) => (
         <View
           key={index}

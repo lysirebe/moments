@@ -66,9 +66,7 @@ export function BottomNav({ active, onPress }: BottomNavProps) {
         style={styles.tab}
       >
         <ImportIcon active={active === 'import'} />
-        <Text style={[styles.label, active === 'import' && styles.labelActive]}>
-          Import
-        </Text>
+        <Text style={[styles.label, active === 'import' && styles.labelActive]}>Import</Text>
       </Pressable>
 
       <Pressable
@@ -87,12 +85,7 @@ export function BottomNav({ active, onPress }: BottomNavProps) {
         style={styles.tab}
       >
         <CollectionsIcon active={active === 'collections'} />
-        <Text
-          style={[
-            styles.label,
-            active === 'collections' && styles.labelActive,
-          ]}
-        >
+        <Text style={[styles.label, active === 'collections' && styles.labelActive]}>
           Collections
         </Text>
       </Pressable>

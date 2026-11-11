@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  FlatList,
-  Modal,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { FlatList, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Text, colors, spacing, radii } from '@moments/ui';
 
 export interface SelectOption {
@@ -22,14 +16,7 @@ interface SelectProps {
   disabled?: boolean;
 }
 
-export function Select({
-  label,
-  placeholder,
-  value,
-  options,
-  onSelect,
-  disabled,
-}: SelectProps) {
+export function Select({ label, placeholder, value, options, onSelect, disabled }: SelectProps) {
   const [open, setOpen] = useState(false);
   const selected = options.find((option) => option.value === value);
 
@@ -48,11 +35,7 @@ export function Select({
           variant="body"
           numberOfLines={1}
           style={styles.triggerLabel}
-          color={
-            selected
-              ? colors.scriptureSearchText
-              : colors.scriptureSearchPlaceholder
-          }
+          color={selected ? colors.scriptureSearchText : colors.scriptureSearchPlaceholder}
         >
           {selected?.label ?? placeholder}
         </Text>
@@ -61,19 +44,10 @@ export function Select({
         </Text>
       </Pressable>
 
-      <Modal
-        visible={open}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setOpen(false)}
-      >
+      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
           <View style={styles.sheet} onStartShouldSetResponder={() => true}>
-            <Text
-              variant="title"
-              color={colors.darkBlue}
-              style={styles.sheetTitle}
-            >
+            <Text variant="title" color={colors.darkBlue} style={styles.sheetTitle}>
               {label}
             </Text>
             <FlatList

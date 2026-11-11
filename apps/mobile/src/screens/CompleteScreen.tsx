@@ -22,22 +22,14 @@ export function CompleteScreen({ onViewMoment, onHome }: CompleteScreenProps) {
       <View style={styles.content}>
         <MomentsLogo color={colors.completeLogo} width={150} />
         <Text style={styles.title}>Your Moment has been enriched</Text>
-        <Text style={styles.hand}>it's yours to come back to.</Text>
+        <Text style={styles.hand}>it&rsquo;s yours to come back to.</Text>
       </View>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onViewMoment}
-          style={styles.button}
-        >
+        <Pressable accessibilityRole="button" onPress={onViewMoment} style={styles.button}>
           <Text style={styles.buttonText}>View Moment</Text>
         </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onHome}
-          style={styles.later}
-        >
+        <Pressable accessibilityRole="button" onPress={onHome} style={styles.later}>
           <Text style={styles.laterText}>Back to home</Text>
         </Pressable>
       </View>

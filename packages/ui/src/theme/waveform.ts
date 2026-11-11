@@ -47,7 +47,6 @@ export interface WaveformOptions {
 export function makeWaveformBars(
   count: number,
   maxHeight: number,
-  seed = 1,
   color = '#3156B8',
   options: WaveformOptions = {},
 ): WaveformBar[] {
@@ -68,10 +67,7 @@ export function makeWaveformBars(
   const bars: WaveformBar[] = [];
   for (let i = 0; i < count; i++) {
     const x = i / (count - 1);
-    const lobe = Math.pow(
-      0.5 + 0.5 * Math.sin(2 * Math.PI * frequency * x + phase),
-      power,
-    );
+    const lobe = Math.pow(0.5 + 0.5 * Math.sin(2 * Math.PI * frequency * x + phase), power);
     const env = 0.07 + 0.93 * lobe;
     const jitter = 0.72 + 0.28 * Math.sin(i * 2.31) * Math.cos(i * 0.87 + 1);
     const h = Math.max(minHeight, maxHeight * env * jitter);
@@ -130,10 +126,7 @@ export function makeMiniBars(
   const bars: WaveformBar[] = [];
   for (let i = 0; i < count; i++) {
     const x = i / (count - 1);
-    const lobe = Math.pow(
-      0.5 + 0.5 * Math.sin(2 * Math.PI * frequency * x + phase),
-      power,
-    );
+    const lobe = Math.pow(0.5 + 0.5 * Math.sin(2 * Math.PI * frequency * x + phase), power);
     const env = 0.25 + 0.75 * lobe;
     const jitter = 0.6 + 0.4 * rand();
     const h = Math.max(minHeight, maxHeight * env * jitter);

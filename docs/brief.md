@@ -4,7 +4,7 @@
 
 Worship encounters are fleeting. The sound is often captured, but the story
 around it — the scripture that inspired it, the prayers prayed, the revelation
-received — is lost. People want to preserve the *whole* encounter, not just the
+received — is lost. People want to preserve the _whole_ encounter, not just the
 audio.
 
 ## Vision
@@ -17,14 +17,14 @@ conferences and spontaneous gatherings.
 
 A **Moment** is the audio plus everything around it.
 
-| Field | Description |
-| --- | --- |
-| **Sound** | Recorded in the app or uploaded. Stored privately, streamed via signed URLs. |
-| **Context** | Title, date, place, people, artwork and type. |
-| **Scripture** | The verses that inspired or were referenced during the Moment. |
-| **Prayers** | What was prayed during or because of the Moment. |
-| **Revelations** | What was learned or understood. |
-| **Highlights** | Meaningful timestamps with a short note. |
+| Field           | Description                                                                  |
+| --------------- | ---------------------------------------------------------------------------- |
+| **Sound**       | Recorded in the app or uploaded. Stored privately, streamed via signed URLs. |
+| **Context**     | Title, date, place, people, artwork and type.                                |
+| **Scripture**   | The verses that inspired or were referenced during the Moment.               |
+| **Prayers**     | What was prayed during or because of the Moment.                             |
+| **Revelations** | What was learned or understood.                                              |
+| **Highlights**  | Meaningful timestamps with a short note.                                     |
 
 ## Personas
 
@@ -47,6 +47,7 @@ A **Moment** is the audio plus everything around it.
 ## Scope
 
 ### P1 — Core capture
+
 - Sign up / sign in (Supabase Auth)
 - Record or upload audio
 - Add context (title, date, place, people, type, artwork)
@@ -54,12 +55,14 @@ A **Moment** is the audio plus everything around it.
 - Playback with waveform
 
 ### P2 — Meaning
+
 - Transcription (Whisper) powering search
 - Scripture attach (licensed Bible API)
 - Highlights with timestamps
 - Search across Moments
 
 ### P3 — Community
+
 - Sharing a Moment
 - Collections
 - Collaborative Moments

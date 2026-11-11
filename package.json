@@ -10,20 +10,32 @@
   ],
   "scripts": {
     "dev:mobile": "npm run start --workspace @moments/mobile",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
-    "supabase:migrate": "supabase db reset",
+    "supabase:reset": "supabase db reset",
     "supabase:status": "supabase status",
     "supabase:gen:types": "supabase gen types typescript --local > packages/types/src/supabase.ts"
   },
   "devDependencies": {
-    "turbo": "^2.3.3"
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.0.0",
+    "prettier": "^3.6.0",
+    "turbo": "^2.3.3",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19"
   },
   "packageManager": "npm@10.9.0"
 }

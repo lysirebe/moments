@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { colors, fonts, radii } from '../theme';
 
 export interface TileProps {
@@ -42,9 +42,7 @@ export function Tile({ label, selected, onPress }: TileProps) {
       ]}
     >
       {selected && <CheckBadge />}
-      <Text style={[styles.label, selected && styles.labelSelected]}>
-        {label}
-      </Text>
+      <Text style={[styles.label, selected && styles.labelSelected]}>{label}</Text>
     </Pressable>
   );
 }

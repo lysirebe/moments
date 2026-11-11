@@ -16,14 +16,9 @@ const ThemeContext = createContext<Theme>({
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const value = useMemo<Theme>(
-    () => ({ colors, spacing, typography, radii }),
-    [],
-  );
+  const value = useMemo<Theme>(() => ({ colors, spacing, typography, radii }), []);
 
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme(): Theme {

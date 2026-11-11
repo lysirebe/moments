@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -12,9 +12,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { colors, fonts, makeMiniBars } from '@moments/ui';
 import { BottomNav, PaperGrain, Waveform } from '@moments/ui';
-import type { Moment, MomentType } from '@moments/types';
-import { listMoments } from '../lib/moments';
-import { useAuth } from '../features/auth/AuthProvider';
+import type { MomentType } from '@moments/types';
+import { useMoments } from '../features/moment/useMoments';
+import { formatDuration, formatLongDate } from '../lib/format';
 
 export interface CollectionsScreenProps {
   onBack: () => void;
@@ -62,22 +62,6 @@ function Arrow() {
   );
 }
 
-function formatDate(date: string): string {
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return date;
-  return d.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
-
 /**
  * Collections (S10.dc.html): search, filter, list of Moment cards, bottom nav.
  */
@@ -88,37 +72,10 @@ export function CollectionsScreen({
   onImport,
 }: CollectionsScreenProps) {
   const insets = useSafeAreaInsets();
-  const { session } = useAuth();
-
-  const [moments, setMoments] = useState<Moment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { moments, loading, error } = useMoments();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<MomentType | 'all'>('all');
   const [showFilters, setShowFilters] = useState(false);
-
-  useEffect(() => {
-    const userId = session?.user?.id;
-    if (!userId) return;
-
-    let active = true;
-    listMoments(userId)
-      .then((data) => {
-        if (active) {
-          setMoments(data);
-          setError(null);
-        }
-      })
-      .catch((err) => {
-        if (active) setError(err.message ?? 'Could not load your Moments.');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const visibleMoments = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -187,9 +144,7 @@ export function CollectionsScreen({
                 onPress={() => toggleFilter(item.value)}
                 style={[styles.chip, active && styles.chipActive]}
               >
-                <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                  {item.label}
-                </Text>
+                <Text style={[styles.chipText, active && styles.chipTextActive]}>{item.label}</Text>
               </Pressable>
             );
           })}
@@ -217,10 +172,7 @@ export function CollectionsScreen({
           </Text>
         </View>
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
-        >
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.list}>
           {visibleMoments.map((moment, index) => (
             <Pressable
               key={moment.id}
@@ -244,7 +196,7 @@ export function CollectionsScreen({
                   {moment.title}
                 </Text>
                 <Text style={styles.cardMeta}>
-                  {formatDate(moment.date)} · {formatDuration(moment.audio.duration)}
+                  {formatLongDate(moment.date)} · {formatDuration(moment.audio?.duration ?? 0)}
                 </Text>
               </View>
               <Arrow />

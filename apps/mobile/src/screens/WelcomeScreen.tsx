@@ -33,21 +33,14 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   return (
     <View style={styles.container}>
       <View style={styles.message}>
-        <Text style={[styles.hand, styles.handLeft]}>
-          Welcome to Moments.
-        </Text>
+        <Text style={[styles.hand, styles.handLeft]}>Welcome to Moments.</Text>
         <Text style={[styles.hand, styles.handRight]}>
           A quiet place to keep what God is doing.
         </Text>
       </View>
 
       <View style={[styles.footer, { bottom: insets.bottom + 92 }]}>
-        <PillButton
-          label="Start"
-          icon={<ArrowIcon />}
-          onPress={onStart}
-          minWidth={140}
-        />
+        <PillButton label="Start" icon={<ArrowIcon />} onPress={onStart} minWidth={140} />
       </View>
     </View>
   );

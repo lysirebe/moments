@@ -1,5 +1,5 @@
 // Edge function: bible
-// Proxies the api.bible REST API so the api key never lives in the client.
+// Proxies the api.bible REST API so the API key never lives in the client.
 //
 // Actions:
 //   books    -> GET /bibles/{bibleId}/books
@@ -7,69 +7,64 @@
 //   verses   -> GET /bibles/{bibleId}/chapters/{chapterId}/verses
 //   passage  -> GET /bibles/{bibleId}/passages/{passageId}
 
-const API_BIBLE_KEY = Deno.env.get('API_BIBLE_KEY')!;
+import { handlePreflight, json, requireEnv } from '../_shared/http.ts';
+
+const API_BIBLE_KEY = requireEnv('API_BIBLE_KEY');
 const API_BIBLE_BASE = 'https://rest.api.bible/v1';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
+type Action = 'books' | 'chapters' | 'verses' | 'passage';
 
-function buildUrl(action: string, params: Record<string, string>): string {
-  const { bibleId, bookId, chapterId, passageId } = params;
+interface BibleRequest {
+  action: Action;
+  bibleId: string;
+  bookId?: string;
+  chapterId?: string;
+  passageId?: string;
+}
+
+/** IDs from api.bible are alphanumeric with `.` and `-` separators. */
+const SAFE_ID = /^[A-Za-z0-9.-]+$/;
+
+function isSafeId(value: unknown): value is string {
+  return typeof value === 'string' && SAFE_ID.test(value);
+}
+
+/** Builds the upstream URL, or returns `null` if the request is invalid. */
+function buildUrl(req: BibleRequest): string | null {
+  const { action, bibleId, bookId, chapterId, passageId } = req;
+  if (!isSafeId(bibleId)) return null;
+  const bible = `${API_BIBLE_BASE}/bibles/${bibleId}`;
 
   switch (action) {
     case 'books':
-      return `${API_BIBLE_BASE}/bibles/${bibleId}/books`;
+      return `${bible}/books`;
     case 'chapters':
-      return `${API_BIBLE_BASE}/bibles/${bibleId}/books/${bookId}/chapters`;
+      return isSafeId(bookId) ? `${bible}/books/${bookId}/chapters` : null;
     case 'verses':
-      return `${API_BIBLE_BASE}/bibles/${bibleId}/chapters/${chapterId}/verses`;
+      return isSafeId(chapterId) ? `${bible}/chapters/${chapterId}/verses` : null;
     case 'passage':
-      return `${API_BIBLE_BASE}/bibles/${bibleId}/passages/${passageId}`;
+      return isSafeId(passageId) ? `${bible}/passages/${passageId}` : null;
     default:
-      throw new Error(`Unknown action: ${action}`);
+      return null;
   }
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const preflight = handlePreflight(req);
+  if (preflight) return preflight;
 
   try {
-    const { action, bibleId, bookId, chapterId, passageId } = await req.json();
+    const url = buildUrl((await req.json()) as BibleRequest);
+    if (!url) return json({ error: 'Invalid action or parameters' }, 400);
 
-    if (!action || !bibleId) {
-      return new Response(
-        JSON.stringify({ error: 'action and bibleId are required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
-
-    const url = buildUrl(action, { bibleId, bookId, chapterId, passageId });
-
-    const apiRes = await fetch(url, {
-      headers: { 'api-key': API_BIBLE_KEY },
-    });
-
+    const apiRes = await fetch(url, { headers: { 'api-key': API_BIBLE_KEY } });
     if (!apiRes.ok) {
-      return new Response(
-        JSON.stringify({ error: `api.bible request failed (${apiRes.status})` }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return json({ error: `api.bible request failed (${apiRes.status})` }, 502);
     }
 
-    const data = await apiRes.json();
-
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return json(await apiRes.json());
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: String(err) }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    console.error('bible proxy failed', err);
+    return json({ error: 'Unexpected error' }, 500);
   }
 });

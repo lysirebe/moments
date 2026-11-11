@@ -8,28 +8,28 @@ Moments is built around a single idea: **a Moment is the audio plus everything a
 
 A **Moment** is the core object of the platform. It is the audio recording plus the story that surrounds it:
 
-| Field | Description |
-| --- | --- |
-| **Sound** | Recorded in the app or uploaded. Stored privately, streamed via signed URLs. |
-| **Context** | Title, date, place, people, artwork and type. |
-| **Scripture** | The verses that inspired or were referenced during the Moment. |
-| **Prayers** | What was prayed during or because of the Moment. |
-| **Revelations** | What was learned or understood. |
-| **Highlights** | Meaningful timestamps with a short note. |
+| Field           | Description                                                                  |
+| --------------- | ---------------------------------------------------------------------------- |
+| **Sound**       | Recorded in the app or uploaded. Stored privately, streamed via signed URLs. |
+| **Context**     | Title, date, place, people, artwork and type.                                |
+| **Scripture**   | The verses that inspired or were referenced during the Moment.               |
+| **Prayers**     | What was prayed during or because of the Moment.                             |
+| **Revelations** | What was learned or understood.                                              |
+| **Highlights**  | Meaningful timestamps with a short note.                                     |
 
 ## Tech Stack
 
-| Layer | Choice | Why |
-| --- | --- | --- |
-| Mobile app | React Native with Expo | One codebase for iOS and Android; good audio libraries |
-| Backend | Supabase (Postgres, Auth, Storage, row-level security) | Auth, database and private file storage in one place |
-| Audio storage | Supabase Storage, private buckets, signed URLs | Supports "no downloads" by default |
-| Audio | `expo-audio` / `react-native-track-player`; waveform via a peaks file | Background playback and lock-screen controls |
-| Transcription (P2) | Whisper API or similar | Powers search and Scripture suggestions |
-| Scripture data (P2) | Licensed Bible API (check licences for translations) | Built-in Bible and verse attach |
-| Analytics | PostHog | Privacy-friendly funnels and retention |
-| Errors | Sentry | Crash reports |
-| Build / CI | EAS Build (mobile), GitHub Actions | Standard |
+| Layer               | Choice                                                                | Why                                                    |
+| ------------------- | --------------------------------------------------------------------- | ------------------------------------------------------ |
+| Mobile app          | React Native with Expo                                                | One codebase for iOS and Android; good audio libraries |
+| Backend             | Supabase (Postgres, Auth, Storage, row-level security)                | Auth, database and private file storage in one place   |
+| Audio storage       | Supabase Storage, private buckets, signed URLs                        | Supports "no downloads" by default                     |
+| Audio               | `expo-audio` / `react-native-track-player`; waveform via a peaks file | Background playback and lock-screen controls           |
+| Transcription (P2)  | Whisper API or similar                                                | Powers search and Scripture suggestions                |
+| Scripture data (P2) | Licensed Bible API (check licences for translations)                  | Built-in Bible and verse attach                        |
+| Analytics           | PostHog                                                               | Privacy-friendly funnels and retention                 |
+| Errors              | Sentry                                                                | Crash reports                                          |
+| Build / CI          | EAS Build (mobile), GitHub Actions                                    | Standard                                               |
 
 ## Repository Structure
 
@@ -77,10 +77,10 @@ This starts the Expo dev server. Scan the QR code with the Expo Go app, or press
 
 ```bash
 npm run supabase:start
-npm run supabase:migrate
+npm run supabase:reset
 ```
 
-This starts the local Supabase stack and applies the migrations in `supabase/migrations/`.
+This starts the local Supabase stack, applies the migrations in `supabase/migrations/` and loads `supabase/seed.sql` (demo user `demo@moments.app` / `password123`).
 
 ### Environment variables
 
@@ -94,14 +94,18 @@ Never commit real secrets. See `.gitignore`.
 
 ## Scripts
 
-| Command | Description |
-| --- | --- |
-| `npm run dev:mobile` | Start the Expo dev server |
-| `npm run typecheck` | Type-check all packages |
-| `npm run lint` | Lint all packages |
-| `npm run supabase:start` | Start local Supabase |
-| `npm run supabase:migrate` | Apply migrations |
-| `npm run supabase:stop` | Stop local Supabase |
+| Command                      | Description                                  |
+| ---------------------------- | -------------------------------------------- |
+| `npm run dev:mobile`         | Start the Expo dev server                    |
+| `npm run check`              | Format check, lint, typecheck and unit tests |
+| `npm run lint`               | ESLint across the monorepo                   |
+| `npm run typecheck`          | Type-check every workspace                   |
+| `npm test`                   | Run unit tests (Vitest)                      |
+| `npm run format`             | Format with Prettier                         |
+| `npm run supabase:start`     | Start local Supabase                         |
+| `npm run supabase:reset`     | Re-apply migrations and seed data            |
+| `npm run supabase:gen:types` | Regenerate database types from local schema  |
+| `npm run supabase:stop`      | Stop local Supabase                          |
 
 ## License
 

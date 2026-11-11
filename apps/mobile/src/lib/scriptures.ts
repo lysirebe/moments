@@ -1,8 +1,7 @@
 import type { MomentScripture } from '@moments/types';
 
+import { toScripture } from './mappers';
 import { supabase } from './supabase';
-
-const TABLE = 'moment_scriptures';
 
 export interface CreateScriptureInput {
   momentId: string;
@@ -14,23 +13,32 @@ export interface CreateScriptureInput {
   note?: string;
 }
 
-export async function createScripture(
-  input: CreateScriptureInput,
-): Promise<MomentScripture> {
+export async function createScripture(input: CreateScriptureInput): Promise<MomentScripture> {
   const { data, error } = await supabase
-    .from(TABLE)
+    .from('moment_scriptures')
     .insert({
       moment_id: input.momentId,
       reference: input.reference,
       passage_key: input.passageKey,
       bible_id: input.bibleId,
       translation: input.translation,
-      text: input.text,
-      note: input.note,
+      text: input.text ?? null,
+      note: input.note ?? null,
     })
     .select()
     .single();
 
   if (error) throw error;
-  return data as MomentScripture;
+  return toScripture(data);
+}
+
+export async function listScriptures(momentId: string): Promise<MomentScripture[]> {
+  const { data, error } = await supabase
+    .from('moment_scriptures')
+    .select('*')
+    .eq('moment_id', momentId)
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return data.map(toScripture);
 }

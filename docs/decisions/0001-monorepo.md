@@ -1,6 +1,7 @@
 # ADR-0001: Monorepo with npm workspaces
 
 ## Status
+
 Accepted
 
 ## Context

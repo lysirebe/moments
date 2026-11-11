@@ -39,10 +39,7 @@ export function PaperGrain({ opacity = 0.35 }: PaperGrainProps) {
   }
 
   return (
-    <View
-      pointerEvents="none"
-      style={[StyleSheet.absoluteFill, { opacity }]}
-    >
+    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity }]}>
       {dots}
     </View>
   );

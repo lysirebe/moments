@@ -1,91 +1,91 @@
 // Edge function: transcribe
-// Transcribes an audio file from the private `audio` bucket using the OpenAI
-// Whisper API, then updates the moment's transcript.
+// Transcribes a moment's audio with the OpenAI Whisper API and stores the
+// transcript on its `moments_audio` row.
+//
+// Security: the Supabase client is created with the caller's JWT rather than
+// the service-role key, so every read and write goes through row-level
+// security. A caller can only transcribe audio they own, and the storage path
+// is read from the database rather than trusted from the request body.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')!;
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+import { handlePreflight, json, requireEnv } from '../_shared/http.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
+const OPENAI_API_KEY = requireEnv('OPENAI_API_KEY');
+const SUPABASE_URL = requireEnv('SUPABASE_URL');
+const SUPABASE_ANON_KEY = requireEnv('SUPABASE_ANON_KEY');
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+  const preflight = handlePreflight(req);
+  if (preflight) return preflight;
+
+  const authorization = req.headers.get('Authorization');
+  if (!authorization) {
+    return json({ error: 'Missing Authorization header' }, 401);
   }
 
   try {
-    const { momentId, audioPath } = await req.json();
-
-    if (!momentId || !audioPath) {
-      return new Response(
-        JSON.stringify({ error: 'momentId and audioPath are required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+    const { momentId } = await req.json();
+    if (typeof momentId !== 'string' || momentId.length === 0) {
+      return json({ error: 'momentId is required' }, 400);
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authorization } },
+    });
 
-    // Download the audio from the private bucket.
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return json({ error: 'Not authenticated' }, 401);
+    }
+
+    // RLS only returns the row when the caller owns the moment.
+    const { data: audio, error: audioError } = await supabase
+      .from('moments_audio')
+      .select('id, storage_path, file_name')
+      .eq('moment_id', momentId)
+      .maybeSingle();
+
+    if (audioError) return json({ error: 'Failed to load audio' }, 500);
+    if (!audio) return json({ error: 'Moment audio not found' }, 404);
+
     const { data: file, error: downloadError } = await supabase.storage
       .from('audio')
-      .download(audioPath);
+      .download(audio.storage_path);
 
     if (downloadError || !file) {
-      return new Response(
-        JSON.stringify({ error: 'Failed to download audio' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return json({ error: 'Failed to download audio' }, 404);
     }
 
-    // Send to Whisper.
     const form = new FormData();
-    form.append('file', file, audioPath.split('/').pop() ?? 'audio.m4a');
+    form.append('file', file, audio.file_name ?? 'audio.m4a');
     form.append('model', 'whisper-1');
 
-    const whisperRes = await fetch(
-      'https://api.openai.com/v1/audio/transcriptions',
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
-        body: form,
-      },
-    );
+    const whisperRes = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+      body: form,
+    });
 
     if (!whisperRes.ok) {
-      return new Response(
-        JSON.stringify({ error: 'Transcription failed' }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return json({ error: `Transcription failed (${whisperRes.status})` }, 502);
     }
 
-    const { text } = await whisperRes.json();
+    const { text } = (await whisperRes.json()) as { text: string };
 
-    // Store the transcript on the moment.
     const { error: updateError } = await supabase
-      .from('moments')
+      .from('moments_audio')
       .update({ transcript: text, transcribed: true })
-      .eq('id', momentId);
+      .eq('id', audio.id);
 
-    if (updateError) {
-      return new Response(
-        JSON.stringify({ error: 'Failed to save transcript' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+    if (updateError) return json({ error: 'Failed to save transcript' }, 500);
 
-    return new Response(JSON.stringify({ transcript: text }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return json({ transcript: text });
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: String(err) }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    console.error('transcribe failed', err);
+    return json({ error: 'Unexpected error' }, 500);
   }
 });

@@ -10,13 +10,7 @@ import type { AudioAsset } from './audio';
 
 /** The type of gathering or setting a Moment was captured in. */
 export type MomentType =
-  | 'quiet_time'
-  | 'prayer'
-  | 'living_room'
-  | 'conference'
-  | 'spontaneous'
-  | 'worship'
-  | 'other';
+  'quiet_time' | 'prayer' | 'living_room' | 'conference' | 'spontaneous' | 'worship' | 'other';
 
 /** A person who was present during a Moment. */
 export interface MomentPerson {
@@ -31,9 +25,9 @@ export interface MomentScripture {
   /** e.g. "John 3:16" */
   reference: string;
   /** The api.bible passage key, e.g. "JHN.3.1-JHN.3.16". */
-  passageKey: string;
+  passageKey?: string;
   /** The api.bible bibleId for the translation, e.g. "de4e12af7f28f599". */
-  bibleId: string;
+  bibleId?: string;
   /** The translation code, e.g. "NIV", "ESV", "KJV". */
   translation: string;
   /** The verse text, if captured. */
@@ -44,9 +38,8 @@ export interface MomentScripture {
 
 /** The kind of note attached to a Moment. */
 export type MomentNoteKind =
-  | 'prayer'
-  | 'revelation'
-  | 'reflection';
+  /** A timestamped note typed while recording. */
+  'note' | 'prayer' | 'revelation' | 'reflection';
 
 /** A note attached to a Moment. */
 export interface MomentNote {
@@ -78,19 +71,11 @@ export interface Moment {
   type: MomentType;
   /** Storage path to the artwork image. */
   artworkPath?: string;
-  /** The audio asset for this Moment. */
-  audio: AudioAsset;
-  scriptures: MomentScripture[];
-  notes: MomentNote[];
+  /**
+   * The recording for this Moment, or `null` if none has been attached yet.
+   * Scriptures and notes are loaded separately (see `listNotes`).
+   */
+  audio: AudioAsset | null;
   createdAt: string;
   updatedAt: string;
 }
-
-/** Payload for creating a new Moment. */
-export type CreateMomentInput = Omit<
-  Moment,
-  'id' | 'userId' | 'createdAt' | 'updatedAt'
->;
-
-/** Payload for updating an existing Moment. */
-export type UpdateMomentInput = Partial<CreateMomentInput>;

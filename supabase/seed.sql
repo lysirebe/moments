@@ -73,21 +73,10 @@ values (
     )
 on conflict (id) do nothing;
 
--- A sample Moment
+-- A sample Moment. It has no audio row: upload or record one in the app to
+-- hear playback, since storage objects can't be seeded with SQL.
 insert into
-    public.moments (
-        id,
-        user_id,
-        title,
-        date,
-        place,
-        people,
-        type,
-        audio_path,
-        audio_format,
-        audio_duration,
-        transcribed
-    )
+    public.moments (id, user_id, title, date, place, people, type)
 values (
         '10000000-0000-0000-0000-000000000001',
         '00000000-0000-0000-0000-000000000001',
@@ -95,21 +84,12 @@ values (
         current_date,
         'Living room',
         '[{"id": "p1", "name": "Isobel"}]'::jsonb,
-        'quiet_time',
-        '00000000-0000-0000-0000-000000000001/quiet-time.m4a',
-        'm4a',
-        184,
-        false
+        'quiet_time'
     )
 on conflict (id) do nothing;
 
 insert into
-    public.moment_scriptures (
-        moment_id,
-        reference,
-        translation,
-        text
-    )
+    public.moment_scriptures (moment_id, reference, translation, text)
 values (
         '10000000-0000-0000-0000-000000000001',
         'Psalm 46:10',
@@ -119,34 +99,24 @@ values (
 on conflict do nothing;
 
 insert into
-    public.moment_notes (moment_id, kind, is_during_recording, timestamp, content)
-values (
+    public.moment_notes (moment_id, user_id, kind, content)
+values
+    (
         '10000000-0000-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000001',
         'prayer',
-        false,
-        null,
         'Lord, help me to be still and know that you are God.'
-    )
-on conflict do nothing;
-
-insert into
-    public.moment_notes (moment_id, kind, is_during_recording, timestamp, content)
-values (
+    ),
+    (
         '10000000-0000-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000001',
         'revelation',
-        false,
-        null,
-        'Stillness is not emptiness — it is presence.'
-    )
-on conflict do nothing;
-
-insert into
-    public.moment_notes (moment_id, kind, is_during_recording, timestamp, content)
-values (
+        'Stillness is not emptiness. It is presence.'
+    ),
+    (
         '10000000-0000-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000001',
         'reflection',
-        false,
-        null,
-        'The moment of stillness'
+        'The moment of stillness.'
     )
 on conflict do nothing;

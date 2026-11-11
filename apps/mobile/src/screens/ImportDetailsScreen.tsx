@@ -1,35 +1,16 @@
 import React, { useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { colors, fonts, makeMiniBars } from '@moments/ui';
 import { Waveform, PaperGrain } from '@moments/ui';
 import { pickAudioFile, type SelectedAudioFile } from '../lib/audio';
+import { formatDuration, formatFileSize } from '../lib/format';
 
 export interface ImportDetailsScreenProps {
   file: SelectedAudioFile;
   onBack: () => void;
   onImport: (file: SelectedAudioFile, title: string) => void;
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
-
-function formatSize(bytes?: number): string {
-  if (!bytes) return '';
-  const mb = bytes / (1024 * 1024);
-  if (mb >= 1) return `${mb.toFixed(1)} MB`;
-  return `${Math.round(bytes / 1024)} KB`;
 }
 
 function BackIcon() {
@@ -61,7 +42,7 @@ export function ImportDetailsScreen({ file, onBack, onImport }: ImportDetailsScr
     minHeight: 3,
   });
 
-  const meta = [formatDuration(selected.duration), formatSize(selected.size)]
+  const meta = [formatDuration(selected.duration), formatFileSize(selected.size)]
     .filter(Boolean)
     .join(' · ');
 
@@ -104,10 +85,7 @@ export function ImportDetailsScreen({ file, onBack, onImport }: ImportDetailsScr
         </Pressable>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <Text style={styles.title}>Add details</Text>
 
         <View style={styles.fileCard}>
@@ -117,11 +95,7 @@ export function ImportDetailsScreen({ file, onBack, onImport }: ImportDetailsScr
             </Text>
             <Text style={styles.fileMeta}>{meta}</Text>
           </View>
-          <Pressable
-            accessibilityRole="button"
-            onPress={handleChange}
-            style={styles.change}
-          >
+          <Pressable accessibilityRole="button" onPress={handleChange} style={styles.change}>
             <Text style={styles.changeText}>Change</Text>
           </Pressable>
           <Waveform
@@ -143,20 +117,13 @@ export function ImportDetailsScreen({ file, onBack, onImport }: ImportDetailsScr
         />
 
         <Text style={styles.label}>RECORDED ON</Text>
-        <Pressable
-          accessibilityRole="button"
-          style={styles.dateButton}
-        >
+        <Pressable accessibilityRole="button" style={styles.dateButton}>
           <Text style={styles.dateText}>10 October 2026</Text>
         </Pressable>
 
-        <Text style={styles.hint}>
-          You can add notes, Scripture and more after importing.
-        </Text>
+        <Text style={styles.hint}>You can add notes, Scripture and more after importing.</Text>
 
-        {error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : null}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
@@ -166,9 +133,7 @@ export function ImportDetailsScreen({ file, onBack, onImport }: ImportDetailsScr
           disabled={importing}
           style={[styles.importBtn, importing && styles.importBtnDisabled]}
         >
-          <Text style={styles.importText}>
-            {importing ? 'Importing…' : 'Import Moment'}
-          </Text>
+          <Text style={styles.importText}>{importing ? 'Importing…' : 'Import Moment'}</Text>
         </Pressable>
       </View>
     </View>

@@ -9,11 +9,6 @@ import { supabase } from '../../lib/supabase';
 
 const EDGE_FUNCTION = 'bible';
 
-interface InvokeResult<T> {
-  data: T;
-  error: { message: string } | null;
-}
-
 async function invoke<T>(body: Record<string, string>): Promise<T> {
   const { data, error } = await supabase.functions.invoke<T>(EDGE_FUNCTION, {
     body,
@@ -56,10 +51,7 @@ export async function fetchBooks(bibleId: string): Promise<BibleBook[]> {
   return result.data;
 }
 
-export async function fetchChapters(
-  bibleId: string,
-  bookId: string,
-): Promise<BibleChapter[]> {
+export async function fetchChapters(bibleId: string, bookId: string): Promise<BibleChapter[]> {
   const result = await invoke<{ data: BibleChapter[] }>({
     action: 'chapters',
     bibleId,
@@ -68,10 +60,7 @@ export async function fetchChapters(
   return result.data;
 }
 
-export async function fetchVerses(
-  bibleId: string,
-  chapterId: string,
-): Promise<BibleVerse[]> {
+export async function fetchVerses(bibleId: string, chapterId: string): Promise<BibleVerse[]> {
   const result = await invoke<{ data: BibleVerse[] }>({
     action: 'verses',
     bibleId,
@@ -85,10 +74,7 @@ export async function fetchVerses(
   }));
 }
 
-export async function fetchPassage(
-  bibleId: string,
-  passageId: string,
-): Promise<BiblePassage> {
+export async function fetchPassage(bibleId: string, passageId: string): Promise<BiblePassage> {
   const result = await invoke<{ data: BiblePassage }>({
     action: 'passage',
     bibleId,

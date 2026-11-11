@@ -7,7 +7,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { colors, fonts, radii, spacing } from '../theme';
+import { colors, fonts, radii } from '../theme';
 
 export type PillButtonVariant = 'primary' | 'outline' | 'ghost';
 
@@ -63,9 +63,7 @@ export function PillButton({
       ]}
       {...rest}
     >
-      <Text style={[styles.label, { color: labelColors[variant] }]}>
-        {label}
-      </Text>
+      <Text style={[styles.label, { color: labelColors[variant] }]}>{label}</Text>
       {icon}
     </Pressable>
   );

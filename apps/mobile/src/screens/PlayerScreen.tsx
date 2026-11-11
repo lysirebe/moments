@@ -1,30 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { colors, fonts, makeWaveformBars } from '@moments/ui';
 import { Waveform, PlayerSheet, PaperGrain } from '@moments/ui';
-import type {
-  PlayerSheetAddOption,
-  PlayerSheetSection,
-} from '@moments/ui';
-import type { Moment, MomentNote, MomentScripture } from '@moments/types';
-import { getMoment } from '../lib/moments';
+import type { PlayerSheetAddOption, PlayerSheetSection } from '@moments/ui';
+import type { MomentNote, MomentScripture } from '@moments/types';
 import { getSignedAudioUrl } from '../lib/audio';
-import { listNotes, listScriptures } from '../lib/notes';
+import { errorMessage } from '../lib/errors';
+import type { EnrichmentType } from '../features/enrich/steps';
+import { useMomentDetail } from '../features/moment/useMomentDetail';
 import { EnrichmentDetail, type EnrichmentDetailData } from './EnrichmentDetail';
-
-/** Enrichment types that can be added to an existing moment from the Player. */
-export type EnrichmentType = 'scripture' | 'prayer' | 'revelation' | 'reflection';
+import { formatDuration, formatLongDate } from '../lib/format';
 
 export interface PlayerScreenProps {
-  momentId?: string;
+  momentId: string;
   /** Bump to refetch the moment's enrichments (e.g. after returning from an editor). */
   reloadKey?: number;
   onBack: () => void;
@@ -122,7 +113,9 @@ const addOptions: (PlayerSheetAddOption & { type: EnrichmentType })[] = [
   { type: 'reflection', label: 'Reflection' },
 ];
 
-const noteTitles: Record<MomentNote['kind'], string> = {
+type EnrichmentNoteKind = Exclude<MomentNote['kind'], 'note'>;
+
+const noteTitles: Record<EnrichmentNoteKind, string> = {
   prayer: 'Prayer',
   revelation: 'Revelation',
   reflection: 'Reflection',
@@ -130,16 +123,18 @@ const noteTitles: Record<MomentNote['kind'], string> = {
 
 /** Strip HTML tags (e.g. api.bible's `<p>`, `<span>`) to render as plain text. */
 function stripHtml(html: string): string {
-  return html
-    // Remove verse-number spans entirely (e.g. <span class="v">1</span>).
-    .replace(/<span[^>]*class="v"[^>]*>.*?<\/span>/g, '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return (
+    html
+      // Remove verse-number spans entirely (e.g. <span class="v">1</span>).
+      .replace(/<span[^>]*class="v"[^>]*>.*?<\/span>/g, '')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
 }
 
 interface SheetItem {
@@ -147,20 +142,11 @@ interface SheetItem {
   detail: EnrichmentDetailData;
 }
 
-function formatAddedAt(iso: string): string | undefined {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return undefined;
-  return `Added ${d.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })}`;
+function formatAddedAt(iso: string): string {
+  return `Added ${formatLongDate(iso)}`;
 }
 
-function buildItems(
-  notes: MomentNote[],
-  scriptures: MomentScripture[],
-): SheetItem[] {
+function buildItems(notes: MomentNote[], scriptures: MomentScripture[]): SheetItem[] {
   const result: SheetItem[] = [];
 
   const recordingNotes = notes
@@ -203,7 +189,11 @@ function buildItems(
     });
   }
 
-  for (const n of notes.filter((note) => !note.isDuringRecording)) {
+  const enrichmentNotes = notes.filter(
+    (note): note is MomentNote & { kind: EnrichmentNoteKind } =>
+      !note.isDuringRecording && note.kind !== 'note',
+  );
+  for (const n of enrichmentNotes) {
     result.push({
       section: { type: n.kind, title: noteTitles[n.kind], preview: n.content },
       detail: {
@@ -215,53 +205,6 @@ function buildItems(
   }
 
   return result;
-}
-
-const mockItems: SheetItem[] = [
-  {
-    section: { type: 'notes', title: 'Notes', preview: '3 notes saved', time: '04:32' },
-    detail: {
-      label: 'Notes',
-      entries: [
-        { time: '04:32', text: 'Peace over the exam' },
-        { time: '08:17', text: 'Thank you for today' },
-        { time: '11:08', text: 'Guide my steps' },
-      ],
-    },
-  },
-  {
-    section: { type: 'scripture', title: 'Scripture', preview: 'Psalm 42:1 · As the deer pants for streams of water…' },
-    detail: {
-      label: 'Scripture',
-      quote: true,
-      body: 'As the deer pants for streams of water, so my soul pants for you, my God.',
-      reference: 'Psalm 42:1 · NIV',
-    },
-  },
-  {
-    section: { type: 'prayer', title: 'Prayer', preview: 'Lord, thank you for your presence today…' },
-    detail: { label: 'Prayer', body: 'Lord, thank you for your presence today. Help me to rest in you.' },
-  },
-  {
-    section: { type: 'revelation', title: 'Revelation', preview: 'Rest is not passive. It is an act of trust.' },
-    detail: { label: 'Revelation', body: 'Rest is not passive. It is an act of trust.' },
-  },
-];
-
-function formatDate(date: string): string {
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return date;
-  return d.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
 /**
@@ -276,56 +219,39 @@ export function PlayerScreen({
 }: PlayerScreenProps) {
   const insets = useSafeAreaInsets();
   const [expanded, setExpanded] = useState(false);
-  const [moment, setMoment] = useState<Moment | null>(null);
   const [signedUrl, setSignedUrl] = useState<string>();
-  const [error, setError] = useState<string>();
+  const [audioError, setAudioError] = useState<string>();
+  const [openDetail, setOpenDetail] = useState<EnrichmentDetailData | null>(null);
+  const { moment, notes, scriptures, error: loadError } = useMomentDetail(momentId, reloadKey);
+  const error = loadError ?? audioError;
 
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
 
   useEffect(() => {
-    // Ensure the audio session is configured for playback (not recording), so
-    // audio is audible even when the device is in silent mode and routes through
-    // the speaker rather than the earpiece.
-    setAudioModeAsync({ playsInSilentMode: true, allowsRecording: false }).catch(
-      () => {},
+    // Configure the audio session for playback (not recording) so audio plays
+    // in silent mode and routes through the speaker rather than the earpiece.
+    setAudioModeAsync({ playsInSilentMode: true, allowsRecording: false }).catch((err: unknown) =>
+      console.warn('Could not set audio mode', err),
     );
   }, []);
-  const [notes, setNotes] = useState<MomentNote[]>([]);
-  const [scriptures, setScriptures] = useState<MomentScripture[]>([]);
-  const [openDetail, setOpenDetail] = useState<EnrichmentDetailData | null>(null);
 
+  const audioPath = moment?.audio?.path;
   useEffect(() => {
-    if (!momentId) return;
-    let active = true;
-    getMoment(momentId)
-      .then((data) => {
-        if (active) setMoment(data);
-      })
-      .catch(() => {
-        if (active) setMoment(null);
-      });
-    return () => {
-      active = false;
-    };
-  }, [momentId]);
-
-  useEffect(() => {
-    const path = moment?.audio.path;
-    if (!path) return;
+    if (!audioPath) return;
     let cancelled = false;
-    setError(undefined);
-    getSignedAudioUrl(path)
+    setAudioError(undefined);
+    getSignedAudioUrl(audioPath)
       .then((url) => {
         if (!cancelled) setSignedUrl(url);
       })
-      .catch((err) => {
-        if (!cancelled) setError(String(err));
+      .catch((err: unknown) => {
+        if (!cancelled) setAudioError(errorMessage(err, 'Could not load the audio.'));
       });
     return () => {
       cancelled = true;
     };
-  }, [moment?.audio.path]);
+  }, [audioPath]);
 
   useEffect(() => {
     if (signedUrl) {
@@ -348,38 +274,24 @@ export function PlayerScreen({
     player.seekTo(target);
   };
 
-  useEffect(() => {
-    if (!momentId) return;
-    let active = true;
-    Promise.all([listNotes(momentId), listScriptures(momentId)])
-      .then(([n, s]) => {
-        if (!active) return;
-        setNotes(n);
-        setScriptures(s);
-      })
-      .catch(() => {
-        // Leave the previous enrichments in place if the refetch fails.
-      });
-    return () => {
-      active = false;
-    };
-  }, [momentId, reloadKey]);
-
-  // Without a moment (design prototype) fall back to the mock sections.
-  const items = useMemo(
-    () => (momentId ? buildItems(notes, scriptures) : mockItems),
-    [momentId, notes, scriptures],
-  );
+  const items = useMemo(() => buildItems(notes, scriptures), [notes, scriptures]);
   const sections = useMemo(() => items.map((i) => i.section), [items]);
 
-  const title = moment?.title ?? 'Saturday morning worship';
-  const date = moment ? formatDate(moment.date) : '10 October 2026';
-  const durationSeconds = status.duration > 0 ? status.duration : (moment?.audio.duration ?? 0);
+  const title = moment?.title ?? '';
+  const date = moment ? formatLongDate(moment.date) : '';
+  const durationSeconds = status.duration > 0 ? status.duration : (moment?.audio?.duration ?? 0);
+  // Notes written while recording become markers on the waveform.
+  const markers =
+    durationSeconds > 0
+      ? notes
+          .filter((n) => n.timestamp !== undefined)
+          .map((n) => Math.min(1, (n.timestamp ?? 0) / durationSeconds))
+      : [];
   const duration = formatDuration(durationSeconds);
   const currentTime = formatDuration(status.currentTime);
   const progress = durationSeconds > 0 ? Math.min(1, status.currentTime / durationSeconds) : 0;
 
-  const bars = makeWaveformBars(64, 200, 5, colors.playerBar, {
+  const bars = makeWaveformBars(64, 200, colors.playerBar, {
     frequency: 1.6,
     phase: -0.9,
     power: 1.4,
@@ -405,11 +317,7 @@ export function PlayerScreen({
         >
           <BackIcon />
         </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Share"
-          style={styles.iconBtn}
-        >
+        <Pressable accessibilityRole="button" accessibilityLabel="Share" style={styles.iconBtn}>
           <ShareIcon />
         </Pressable>
       </View>
@@ -421,16 +329,11 @@ export function PlayerScreen({
       </View>
 
       <View style={styles.waveWrap}>
-        <Waveform
-          bars={bars}
-          height={200}
-          barWidth={2}
-          gap={2}
-          paddingHorizontal={28}
-        />
+        <Waveform bars={bars} height={200} barWidth={2} gap={2} paddingHorizontal={28} />
         <View style={[styles.progress, { width: `${progress * 100}%` }]} />
-        <View style={[styles.marker, { left: '64.8%' }]} />
-        <View style={[styles.marker, { left: '87.2%' }]} />
+        {markers.map((position, i) => (
+          <View key={i} style={[styles.marker, { left: `${position * 100}%` }]} />
+        ))}
       </View>
 
       <View style={styles.times}>
@@ -465,9 +368,7 @@ export function PlayerScreen({
         </Pressable>
       </View>
 
-      {error ? (
-        <Text style={styles.errorText}>{error}</Text>
-      ) : null}
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <View style={styles.secondary}>
         <Text style={styles.secondaryText}>1x</Text>
@@ -481,15 +382,12 @@ export function PlayerScreen({
         sections={sections}
         onAddMore={onAddMore}
         // Editing enrichments needs a saved moment to attach them to.
-        addOptions={momentId ? addOptions : undefined}
+        addOptions={addOptions}
         onAddOption={(type) => onAddEnrichment(type as EnrichmentType)}
         onPressSection={(index) => setOpenDetail(items[index]?.detail ?? null)}
       />
 
-      <EnrichmentDetail
-        detail={openDetail}
-        onClose={() => setOpenDetail(null)}
-      />
+      <EnrichmentDetail detail={openDetail} onClose={() => setOpenDetail(null)} />
     </View>
   );
 }

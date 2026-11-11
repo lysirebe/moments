@@ -9,18 +9,22 @@
 ## Options
 
 ### Bible API (bible-api.com)
+
 - **Pros:** Free, no key required, simple JSON.
 - **Cons:** Limited translations, licensing unclear for commercial use.
 
 ### Scripture API (scripture.api.bible)
+
 - **Pros:** Many translations, official API, good docs.
 - **Cons:** Requires an API key; check licensing per translation.
 
 ### YouVersion / Bible.com API
+
 - **Pros:** Large translation set.
 - **Cons:** Restricted access; requires partnership.
 
 ### Local dataset (e.g. open-source Bible JSON)
+
 - **Pros:** Full control, offline, no API dependency.
 - **Cons:** Licensing varies by translation; large data.
 

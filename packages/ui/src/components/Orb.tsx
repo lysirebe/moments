@@ -1,14 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, type ViewStyle } from 'react-native';
-import Svg, {
-  Circle,
-  Ellipse,
-  G,
-  Path,
-  RadialGradient,
-  Stop,
-  Defs,
-} from 'react-native-svg';
+import Svg, { Circle, Ellipse, G, Path, RadialGradient, Stop, Defs } from 'react-native-svg';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -51,13 +43,7 @@ export function Orb({ size = 300, animate = true, style }: OrbProps) {
 
   return (
     <Animated.View style={[{ width: size, height: size }, style]}>
-      <Svg
-        width={size}
-        height={size}
-        viewBox="0 0 340 340"
-        fill="none"
-        strokeLinecap="round"
-      >
+      <Svg width={size} height={size} viewBox="0 0 340 340" fill="none" strokeLinecap="round">
         <Defs>
           <RadialGradient id="orbG" cx="0.42" cy="0.38" r="0.7">
             <Stop offset="0" stopColor="#F4F8FE" />
@@ -95,13 +81,7 @@ export function Orb({ size = 300, animate = true, style }: OrbProps) {
           strokeWidth="0.9"
           opacity="0.5"
         />
-        <AnimatedCircle
-          cx="170"
-          cy="170"
-          r="70"
-          fill="url(#orbG)"
-          transform={[{ scale }]}
-        />
+        <AnimatedCircle cx="170" cy="170" r="70" fill="url(#orbG)" transform={[{ scale }]} />
         <G stroke="#3156B8" strokeWidth="1.8" strokeLinejoin="round">
           <Path d="M165 144.5 C165 138 169 135 171 135 C174 135 178 138.5 178 145 L177.5 168 C177 175 173.5 178 171 178 C167.5 178 164.5 174 164.7 168 Z" />
           <Path d="M155 163 C155 177 162 186 171.5 186 C181 186 188 177 188 163" />

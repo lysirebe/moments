@@ -1,6 +1,7 @@
 # ADR-0002: Audio playback and recording
 
 ## Status
+
 Proposed
 
 ## Context

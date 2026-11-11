@@ -9,14 +9,17 @@
 ## Options
 
 ### OpenAI Whisper API
+
 - **Pros:** High accuracy, simple API, good for audio.
 - **Cons:** Cost per minute, requires API key, audio leaves the device.
 
 ### Local Whisper (whisper.cpp / faster-whisper)
+
 - **Pros:** Private, no per-minute cost.
 - **Cons:** Heavy on-device compute; not ideal for mobile.
 
 ### Supabase Edge Function + Whisper
+
 - **Pros:** Keeps the mobile app light; centralizes the API key.
 - **Cons:** Audio is uploaded to the edge function.
 

@@ -1,15 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, type ViewStyle } from 'react-native';
-import Svg, {
-  Circle,
-  Defs,
-  Ellipse,
-  G,
-  LinearGradient,
-  Path,
-  Rect,
-  Stop,
-} from 'react-native-svg';
+import { Animated, type ViewStyle } from 'react-native';
+import Svg, { Circle, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 export interface DoorSceneProps {
   /** Width of the scene in px. */
@@ -26,12 +17,7 @@ export interface DoorSceneProps {
  * still water, thin concentric rings, light streaks on the water. The door
  * light and rings pulse gently.
  */
-export function DoorScene({
-  width = 393,
-  height = 852,
-  animate = true,
-  style,
-}: DoorSceneProps) {
+export function DoorScene({ width = 393, height = 852, animate = true, style }: DoorSceneProps) {
   const pulse = useRef(new Animated.Value(0.35)).current;
 
   useEffect(() => {
@@ -62,13 +48,7 @@ export function DoorScene({
   });
 
   return (
-    <Svg
-      width={width}
-      height={height}
-      viewBox="0 0 393 852"
-      fill="none"
-      style={style}
-    >
+    <Svg width={width} height={height} viewBox="0 0 393 852" fill="none" style={style}>
       <Defs>
         <LinearGradient id="doorG" x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor="#0A2A5E" />

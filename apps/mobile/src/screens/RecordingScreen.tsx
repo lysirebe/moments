@@ -1,19 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { colors, fonts, makeWaveformBars } from '@moments/ui';
 import { Waveform } from '@moments/ui';
 
+import { useRecordingSession } from '../features/recording/RecordingSessionProvider';
+import { errorMessage } from '../lib/errors';
+import { formatDuration } from '../lib/format';
+
 export interface RecordingScreenProps {
   onBack: () => void;
-  onAddNote: () => void;
+  /** Opens the note sheet, pinned to this position in the recording (seconds). */
+  onAddNote: (timestamp: number) => void;
   onStop: () => void;
 }
 
@@ -47,83 +46,137 @@ function PauseIcon() {
 function StopIcon() {
   return (
     <Svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <Circle
-        cx="12"
-        cy="12"
-        r="9"
-        stroke={colors.recordingControl}
-        strokeWidth="1.8"
-      />
+      <Circle cx="12" cy="12" r="9" stroke={colors.recordingControl} strokeWidth="1.8" />
       <Circle cx="12" cy="12" r="4" fill={colors.recordingControl} />
     </Svg>
   );
 }
 
+function PlayIcon() {
+  return (
+    <Svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M8 5 L19 12 L8 19 Z"
+        stroke={colors.recordingControl}
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <Svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M5 12 L10 17 L19 7"
+        stroke={colors.toastCheck}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+/** Briefly shows "Note saved" whenever `trigger` changes. */
+function useToast(trigger: number | null) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (trigger === null) return;
+    const animation = Animated.sequence([
+      Animated.timing(opacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+      Animated.delay(2000),
+      Animated.timing(opacity, { toValue: 0, duration: 300, useNativeDriver: true }),
+    ]);
+    animation.start();
+    return () => animation.stop();
+  }, [trigger, opacity]);
+  return opacity;
+}
+
 /**
- * Recording (S3.dc.html): navy screen with timer, live waveform, Add notes and
- * Pause/Stop controls.
+ * Recording (S3.dc.html): navy screen with timer, waveform, Add notes and
+ * Pause/Stop controls. Recording starts when the screen opens.
  */
 export function RecordingScreen({ onBack, onAddNote, onStop }: RecordingScreenProps) {
   const insets = useSafeAreaInsets();
-  const [seconds, setSeconds] = useState(0); // starts at 00:00
-  const [ms, setMs] = useState(0);
+  const session = useRecordingSession();
+  const { status, elapsed, lastNoteAddedAt, start, pause, resume, stop, reset } = session;
+  const [error, setError] = useState<string | null>(null);
+  const toastOpacity = useToast(lastNoteAddedAt);
   const bars = useRef(
-    makeWaveformBars(68, 250, 7, colors.recordingBar, {
+    makeWaveformBars(68, 250, colors.recordingBar, {
       accentColor: colors.recordingBarAccent,
     }),
   ).current;
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMs((prev) => {
-        if (prev + 1 >= 1000) {
-          setSeconds((s) => s + 1);
-          return 0;
-        }
-        return prev + 1;
-      });
-    }, 100);
-    return () => clearInterval(interval);
+    if (status !== 'idle') return;
+    start().catch((err: unknown) => setError(errorMessage(err, 'Could not start recording.')));
+    // Start once when the screen opens; later status changes are user-driven.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
-  const ss = String(seconds % 60).padStart(2, '0');
+  const handleBack = () => {
+    if (status === 'idle' || status === 'stopped') {
+      void reset().then(onBack);
+      return;
+    }
+    Alert.alert('Discard this recording?', 'Your audio and notes will not be saved.', [
+      { text: 'Keep recording', style: 'cancel' },
+      { text: 'Discard', style: 'destructive', onPress: () => void reset().then(onBack) },
+    ]);
+  };
+
+  const handleStop = async () => {
+    try {
+      await stop();
+      onStop();
+    } catch (err) {
+      setError(errorMessage(err, 'Could not stop the recording.'));
+    }
+  };
+
+  const tenths = Math.floor((elapsed % 1) * 10);
+  const isPaused = status === 'paused';
 
   return (
     <View style={styles.container}>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.toast, { top: insets.top + 52, opacity: toastOpacity }]}
+      >
+        <CheckIcon />
+        <Text style={styles.toastText}>Note saved</Text>
+      </Animated.View>
+
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Back"
-        onPress={onBack}
+        onPress={handleBack}
         style={[styles.back, { top: insets.top + 16 }]}
       >
         <BackIcon />
       </Pressable>
 
       <View style={[styles.timerWrap, { paddingTop: insets.top + 112 }]}>
-        <View style={styles.timerRow}>
-          <Text style={styles.timer}>
-            {mm}:{ss}
-          </Text>
-          <Text style={styles.ms}>.{String(ms).padStart(3, '0')}</Text>
+        <View style={styles.timerRow} accessibilityLabel={`Recorded ${formatDuration(elapsed)}`}>
+          <Text style={styles.timer}>{formatDuration(elapsed)}</Text>
+          <Text style={styles.ms}>.{tenths}</Text>
         </View>
-        <Text style={styles.label}>Recording</Text>
+        <Text style={styles.label}>{error ?? (isPaused ? 'Paused' : 'Recording')}</Text>
       </View>
 
-      <View style={styles.waveWrap}>
-        <Waveform
-          bars={bars}
-          height={260}
-          barWidth={2}
-          gap={2}
-          paddingHorizontal={28}
-        />
+      <View style={[styles.waveWrap, isPaused && styles.waveWrapPaused]}>
+        <Waveform bars={bars} height={260} barWidth={2} gap={2} paddingHorizontal={28} />
       </View>
 
       <View style={[styles.controls, { bottom: insets.bottom + 92 }]}>
         <Pressable
           accessibilityRole="button"
-          onPress={onAddNote}
+          onPress={() => onAddNote(elapsed)}
+          disabled={status !== 'recording' && status !== 'paused'}
           style={styles.addNote}
         >
           <Text style={styles.addNoteText}>Add notes</Text>
@@ -132,15 +185,18 @@ export function RecordingScreen({ onBack, onAddNote, onStop }: RecordingScreenPr
         <View style={styles.roundControls}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Pause"
+            accessibilityLabel={isPaused ? 'Resume' : 'Pause'}
+            onPress={isPaused ? resume : pause}
+            disabled={status !== 'recording' && status !== 'paused'}
             style={styles.roundControl}
           >
-            <PauseIcon />
+            {isPaused ? <PlayIcon /> : <PauseIcon />}
           </Pressable>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Stop"
-            onPress={onStop}
+            onPress={handleStop}
+            disabled={status !== 'recording' && status !== 'paused'}
             style={styles.roundControl}
           >
             <StopIcon />
@@ -191,6 +247,28 @@ const styles = StyleSheet.create({
   },
   waveWrap: {
     marginTop: 40,
+  },
+  waveWrapPaused: {
+    opacity: 0.4,
+  },
+  toast: {
+    position: 'absolute',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 9999,
+    backgroundColor: colors.toastBg,
+    borderWidth: 1,
+    borderColor: colors.toastBorder,
+    zIndex: 1,
+  },
+  toastText: {
+    fontFamily: fonts.uiMedium,
+    fontSize: 14,
+    color: colors.onNavy,
   },
   controls: {
     position: 'absolute',

@@ -37,12 +37,7 @@ export function LogoRevealScreen({ onDone }: LogoRevealScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.logoWrap,
-          { opacity, transform: [{ scale }] },
-        ]}
-      >
+      <Animated.View style={[styles.logoWrap, { opacity, transform: [{ scale }] }]}>
         <MomentsLogo color={colors.logoBlue} width={150} />
         <Text style={styles.wordmark}>moments</Text>
       </Animated.View>
