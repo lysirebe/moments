@@ -77,10 +77,10 @@ This starts the Expo dev server. Scan the QR code with the Expo Go app, or press
 
 ```bash
 npm run supabase:start
-npm run supabase:migrate
+npm run supabase:reset
 ```
 
-This starts the local Supabase stack and applies the migrations in `supabase/migrations/`.
+This starts the local Supabase stack, applies the migrations in `supabase/migrations/` and loads `supabase/seed.sql` (demo user `demo@moments.app` / `password123`).
 
 ### Environment variables
 
@@ -94,14 +94,18 @@ Never commit real secrets. See `.gitignore`.
 
 ## Scripts
 
-| Command                    | Description               |
-| -------------------------- | ------------------------- |
-| `npm run dev:mobile`       | Start the Expo dev server |
-| `npm run typecheck`        | Type-check all packages   |
-| `npm run lint`             | Lint all packages         |
-| `npm run supabase:start`   | Start local Supabase      |
-| `npm run supabase:migrate` | Apply migrations          |
-| `npm run supabase:stop`    | Stop local Supabase       |
+| Command                      | Description                                  |
+| ---------------------------- | -------------------------------------------- |
+| `npm run dev:mobile`         | Start the Expo dev server                    |
+| `npm run check`              | Format check, lint, typecheck and unit tests |
+| `npm run lint`               | ESLint across the monorepo                   |
+| `npm run typecheck`          | Type-check every workspace                   |
+| `npm test`                   | Run unit tests (Vitest)                      |
+| `npm run format`             | Format with Prettier                         |
+| `npm run supabase:start`     | Start local Supabase                         |
+| `npm run supabase:reset`     | Re-apply migrations and seed data            |
+| `npm run supabase:gen:types` | Regenerate database types from local schema  |
+| `npm run supabase:stop`      | Stop local Supabase                          |
 
 ## License
 
