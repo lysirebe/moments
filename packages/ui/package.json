@@ -25,9 +25,9 @@
   },
   "devDependencies": {
     "@moments/config": "*",
-    "@types/react": "~19.2.4",
-    "react": "19.2.3",
-    "react-native": "0.86.3",
-    "react-native-svg": "15.15.4"
+    "@types/react": "~19.3.0",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-svg": "15.16.0"
   }
 }

@@ -88,7 +88,7 @@ export function PlayerSheet({
   const onToggleRef = useRef(onToggle);
   expandedRef.current = expanded;
   onToggleRef.current = onToggle;
-  const addMoreRef = useRef<View>(null);
+  const addMoreRef = useRef<React.ComponentRef<typeof View>>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const screen = useWindowDimensions();
 
