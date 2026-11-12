@@ -7,11 +7,6 @@
     "icon": "./assets/icon.png",
     "scheme": "moments",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#071F49"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.moments.app",
@@ -36,6 +31,16 @@
         "expo-audio",
         {
           "microphonePermission": "Moments uses the microphone to record audio for your Moments."
+        }
+      ],
+      "expo-font",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#071F49"
         }
       ]
     ]
